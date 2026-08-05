@@ -305,6 +305,7 @@ python manage.py shell
 
 ```python
 from sqlalchemy import select, func
+
 session.scalar(select(func.count()).select_from(SensorEvent))
 ```
 

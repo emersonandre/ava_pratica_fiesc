@@ -71,9 +71,7 @@ def _relatorio_documentos(session) -> tuple[str, int, int]:
         )
         total_trechos += trechos or 0
         ocr += documento.extraction_method == "ocr"
-        confianca = (
-            f"{float(documento.ocr_confidence):.3f}" if documento.ocr_confidence else "—"
-        )
+        confianca = f"{float(documento.ocr_confidence):.3f}" if documento.ocr_confidence else "—"
         linhas.append(
             f"| `{documento.filename}` | {documento.title} | "
             f"`{documento.fault_family or '—'}` | {documento.pages} | {trechos} | "
@@ -187,14 +185,14 @@ def _relatorio_cobertura(session) -> tuple[str, int]:
         "| `estado_operacional` | O padrao e um estado (normal, motor parado), nao falha | **nao** |",
         "| `sem_diagnostico` | A vizinhanca nao sustenta um diagnostico | **nao** |",
         "",
-        "Colapsar os quatro em um generico \"nao sei\" desperdicaria a informacao mais util "
+        'Colapsar os quatro em um generico "nao sei" desperdicaria a informacao mais util '
         "da solucao: o motivo pelo qual o sistema se absteve.",
         "",
         "## Por que o filtro por familia e rigido",
         "",
-        "Os seis documentos compartilham quase o mesmo vocabulario tecnico — \"vibracao "
-        "elevada\", \"aquecimento nos mancais\", \"desgaste de rolamentos\", \"afrouxamento "
-        "de parafusos\". Busca puramente semantica erra, e erra com confianca.",
+        'Os seis documentos compartilham quase o mesmo vocabulario tecnico — "vibracao '
+        'elevada", "aquecimento nos mancais", "desgaste de rolamentos", "afrouxamento '
+        'de parafusos". Busca puramente semantica erra, e erra com confianca.',
         "",
         "Medicao com sete consultas-sonda, uma por assunto conhecido:",
         "",
@@ -206,9 +204,7 @@ def _relatorio_cobertura(session) -> tuple[str, int]:
     for pergunta, familia, esperado in SONDAS:
         sem_filtro = _sonda_sem_filtro(session, pergunta)
         cobertura = coverage.verificar(session, familia)
-        trechos = retrieval.recuperar(
-            session, pergunta, ids_documentos=cobertura.ids_documentos
-        )
+        trechos = retrieval.recuperar(session, pergunta, ids_documentos=cobertura.ids_documentos)
         com_filtro = sorted({t.documento for t in trechos})
         ok_sem = sem_filtro == esperado
         ok_com = com_filtro == [esperado]
@@ -226,7 +222,7 @@ def _relatorio_cobertura(session) -> tuple[str, int]:
         "",
         f"**Acerto: {acertos_sem}/{total} sem filtro, {acertos_com}/{total} com filtro.**",
         "",
-        "Sem o filtro, \"ruido de impacto nas esferas do rolamento\" recupera o manual de "
+        'Sem o filtro, "ruido de impacto nas esferas do rolamento" recupera o manual de '
         "**correias**. A resposta sairia fluente, citada — e apontando o procedimento errado. "
         "Em manutencao industrial isso e pior que nao responder.",
         "",

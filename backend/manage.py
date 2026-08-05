@@ -175,7 +175,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_secrets)
 
     p = sub.add_parser("report", help="gera relatorios de analise")
-    p.add_argument("nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade", "documentos"])
+    p.add_argument(
+        "nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade", "documentos"]
+    )
     p.set_defaults(func=cmd_report)
 
     p = sub.add_parser("check", help="verifica configuracao, banco e artefatos")

@@ -81,12 +81,8 @@ def run(*, forcar: bool = False) -> int:
         registrar_metadado_do_indice(session)
 
         for caminho in arquivos:
-            familia, titulo, evidencia = COBERTURA.get(
-                caminho.name, (None, caminho.stem, None)
-            )
-            resultado = indexar(
-                session, caminho, familia=familia, titulo=titulo, forcar=forcar
-            )
+            familia, titulo, evidencia = COBERTURA.get(caminho.name, (None, caminho.stem, None))
+            resultado = indexar(session, caminho, familia=familia, titulo=titulo, forcar=forcar)
             documento = resultado.documento
 
             if documento.status == "failed":
@@ -100,9 +96,7 @@ def run(*, forcar: bool = False) -> int:
 
             marca = "(ja indexado)" if resultado.ja_existia else ""
             confianca = (
-                f" conf={float(documento.ocr_confidence):.3f}"
-                if documento.ocr_confidence
-                else ""
+                f" conf={float(documento.ocr_confidence):.3f}" if documento.ocr_confidence else ""
             )
             print(
                 f"  {caminho.name:10s} {documento.extraction_method:4s} "

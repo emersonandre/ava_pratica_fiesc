@@ -101,9 +101,7 @@ class LLMProvider:
     # -- chamadas ---------------------------------------------------------
 
     @retry(
-        retry=retry_if_exception_type(
-            (APIConnectionError, APITimeoutError, RateLimitError)
-        ),
+        retry=retry_if_exception_type((APIConnectionError, APITimeoutError, RateLimitError)),
         wait=wait_exponential(multiplier=2, min=2, max=30),
         stop=stop_after_attempt(4),
         reraise=True,
@@ -159,9 +157,7 @@ class LLMProvider:
         opcoes: dict[str, Any] = {
             "max_tokens": max_tokens or self._settings.llm_max_tokens,
             "temperature": (
-                temperatura
-                if temperatura is not None
-                else self._settings.llm_temperature
+                temperatura if temperatura is not None else self._settings.llm_temperature
             ),
         }
         if formato_json:

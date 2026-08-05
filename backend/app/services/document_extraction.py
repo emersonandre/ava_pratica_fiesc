@@ -117,9 +117,7 @@ def _extrair_texto(caminho: Path) -> list[PaginaExtraida]:
         texto = normalizar(pagina.extract_text() or "")
         if texto:
             paginas.append(
-                PaginaExtraida(
-                    documento=caminho.name, pagina=numero, texto=texto, metodo="text"
-                )
+                PaginaExtraida(documento=caminho.name, pagina=numero, texto=texto, metodo="text")
             )
     return paginas
 
@@ -198,9 +196,7 @@ def extrair(caminho: Path) -> DocumentoExtraido:
         metodo = "ocr"
 
     if not paginas:
-        raise DocumentoNaoProcessavel(
-            f"{caminho.name} nao produziu texto utilizavel."
-        )
+        raise DocumentoNaoProcessavel(f"{caminho.name} nao produziu texto utilizavel.")
 
     return DocumentoExtraido(
         caminho=caminho,

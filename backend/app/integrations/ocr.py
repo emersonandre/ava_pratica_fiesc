@@ -92,9 +92,7 @@ def transcrever_pdf(caminho: Path) -> list[PaginaOCR]:
                     texto="\n".join(textos),
                     confianca=sum(confiancas) / len(confiancas),
                     blocos=len(resultado),
-                    blocos_duvidosos=sum(
-                        1 for c in confiancas if c < CONFIANCA_MINIMA_BLOCO
-                    ),
+                    blocos_duvidosos=sum(1 for c in confiancas if c < CONFIANCA_MINIMA_BLOCO),
                 )
             )
             logger.info(

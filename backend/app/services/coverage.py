@@ -56,15 +56,19 @@ class Cobertura:
 
 
 def documentos_da_familia(session: Session, familia: str) -> tuple[DocumentoRef, ...]:
-    linhas = session.execute(
-        select(Document)
-        .join(FaultCoverage, FaultCoverage.document_id == Document.id)
-        .where(
-            FaultCoverage.fault_family == familia,
-            Document.status == "indexed",
+    linhas = (
+        session.execute(
+            select(Document)
+            .join(FaultCoverage, FaultCoverage.document_id == Document.id)
+            .where(
+                FaultCoverage.fault_family == familia,
+                Document.status == "indexed",
+            )
+            .distinct()
         )
-        .distinct()
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     return tuple(
         DocumentoRef(
@@ -78,9 +82,7 @@ def documentos_da_familia(session: Session, familia: str) -> tuple[DocumentoRef,
     )
 
 
-def verificar(
-    session: Session, familia: str | None, *, e_problema: bool = True
-) -> Cobertura:
+def verificar(session: Session, familia: str | None, *, e_problema: bool = True) -> Cobertura:
     """Decide se o sistema pode prescrever. Chamado ANTES do LLM."""
     if familia is None:
         return Cobertura(
@@ -140,7 +142,9 @@ def verificar(
 
 def mapa_de_cobertura(session: Session) -> dict[str, tuple[DocumentoRef, ...]]:
     """Familia -> documentos, para todas as familias de problema da taxonomia."""
-    return {familia: documentos_da_familia(session, familia) for familia in sorted(PROBLEM_FAMILIES)}
+    return {
+        familia: documentos_da_familia(session, familia) for familia in sorted(PROBLEM_FAMILIES)
+    }
 
 
 def familias_descobertas(session: Session) -> list[str]:
