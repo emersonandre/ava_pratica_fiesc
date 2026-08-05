@@ -24,9 +24,7 @@ logger = logging.getLogger("prescritiva.indexacao")
 
 
 class ResultadoIndexacao:
-    def __init__(
-        self, documento: Document, *, trechos: int, ja_existia: bool = False
-    ) -> None:
+    def __init__(self, documento: Document, *, trechos: int, ja_existia: bool = False) -> None:
         self.documento = documento
         self.trechos = trechos
         self.ja_existia = ja_existia
@@ -72,9 +70,7 @@ def indexar(
     existente = _buscar_por_hash(session, extraido.hash_conteudo)
     if existente and not forcar:
         logger.info("%s ja indexado (documento %d)", caminho.name, existente.id)
-        return ResultadoIndexacao(
-            existente, trechos=len(existente.chunks), ja_existia=True
-        )
+        return ResultadoIndexacao(existente, trechos=len(existente.chunks), ja_existia=True)
     if existente:
         # Reindexacao forcada: remove os trechos antigos para nao duplicar.
         session.delete(existente)

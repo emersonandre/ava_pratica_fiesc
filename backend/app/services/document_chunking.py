@@ -21,9 +21,7 @@ from dataclasses import dataclass
 from app.services.document_extraction import PaginaExtraida
 
 # "1. Objetivo", "2.1 Desalinhamento Paralelo", "4.1 Acumulo de Material"
-CABECALHO_SECAO = re.compile(
-    r"^\s*(\d{1,2}(?:\.\d{1,2})*)\.?\s+([A-Za-zÀ-ÿ][^\n]{2,80})\s*$"
-)
+CABECALHO_SECAO = re.compile(r"^\s*(\d{1,2}(?:\.\d{1,2})*)\.?\s+([A-Za-zÀ-ÿ][^\n]{2,80})\s*$")
 
 # Um trecho grande demais dilui o embedding; pequeno demais perde contexto.
 MAX_CARACTERES = 1400
@@ -138,8 +136,10 @@ def dividir(paginas: list[PaginaExtraida]) -> list[Trecho]:
         for pedaco in _quebrar_por_tamanho(texto):
             # O titulo da secao entra no texto indexado: a consulta do operador
             # costuma usar as mesmas palavras do cabecalho.
-            conteudo = pedaco if bloco.secao and pedaco.startswith(bloco.secao) else (
-                f"{bloco.secao}\n{pedaco}" if bloco.secao else pedaco
+            conteudo = (
+                pedaco
+                if bloco.secao and pedaco.startswith(bloco.secao)
+                else (f"{bloco.secao}\n{pedaco}" if bloco.secao else pedaco)
             )
             trechos.append(
                 Trecho(

@@ -26,6 +26,7 @@ from fastapi.responses import RedirectResponse
 
 from app.controllers import health
 from app.controllers.internal import events as internal_events
+from app.controllers.v1 import auth as v1_auth
 from app.settings import get_settings
 
 logger = logging.getLogger("prescritiva")
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
     )
 
     application.include_router(health.router)
+    application.include_router(v1_auth.router)
     application.include_router(internal_events.router)
 
     @application.get("/", include_in_schema=False)
