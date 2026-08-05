@@ -12,7 +12,7 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | --- | --- |
 | Features | 16 |
 | Features concluídas | 2 |
-| Tarefas concluídas | 42 / 112 (38%) |
+| Tarefas concluídas | 74 / 112 (66%) |
 
 ## Infraestrutura e dados
 
@@ -28,16 +28,16 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | Status | Feature | Tarefas | Aceite |
 | :---: | --- | :---: | :---: |
 | 🟨 | [SPEC-FEAT-005 — Motor de similaridade histórica](SPEC-FEAT-005/spec.md) | 6/7 | 4/6 |
-| ⬜ | [SPEC-FEAT-006 — Extração de texto e OCR dos documentos](SPEC-FEAT-006/spec.md) | 0/7 | 0/6 |
-| ⬜ | [SPEC-FEAT-007 — Indexação semântica dos documentos](SPEC-FEAT-007/spec.md) | 0/7 | 0/6 |
-| ⬜ | [SPEC-FEAT-008 — Mapa falha→documento e gate de cobertura](SPEC-FEAT-008/spec.md) | 0/7 | 0/7 |
+| 🟨 | [SPEC-FEAT-006 — Extração de texto e OCR dos documentos](SPEC-FEAT-006/spec.md) | 7/7 | 5/6 |
+| 🟨 | [SPEC-FEAT-007 — Indexação semântica dos documentos](SPEC-FEAT-007/spec.md) | 7/7 | 5/6 |
+| 🟨 | [SPEC-FEAT-008 — Mapa falha→documento e gate de cobertura](SPEC-FEAT-008/spec.md) | 7/7 | 4/7 |
 
 ## RAG e LLM
 
 | Status | Feature | Tarefas | Aceite |
 | :---: | --- | :---: | :---: |
-| ⬜ | [SPEC-FEAT-009 — Provider de LLM plugável](SPEC-FEAT-009/spec.md) | 0/6 | 0/5 |
-| ⬜ | [SPEC-FEAT-010 — Recuperação de contexto para prescrição](SPEC-FEAT-010/spec.md) | 0/6 | 0/5 |
+| 🟨 | [SPEC-FEAT-009 — Provider de LLM plugável](SPEC-FEAT-009/spec.md) | 6/6 | 4/5 |
+| 🟨 | [SPEC-FEAT-010 — Recuperação de contexto para prescrição](SPEC-FEAT-010/spec.md) | 5/6 | 5/5 |
 | ⬜ | [SPEC-FEAT-011 — Geração prescritiva com citações](SPEC-FEAT-011/spec.md) | 0/6 | 0/6 |
 | ⬜ | [SPEC-FEAT-012 — Guarda anti-alucinação](SPEC-FEAT-012/spec.md) | 0/6 | 0/7 |
 

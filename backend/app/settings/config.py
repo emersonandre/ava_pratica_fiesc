@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     vision_model: str = "gpt-4.1-mini"
 
     # --- Embeddings ---
-    embedding_model: str = "intfloat/multilingual-e5-small"
+    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     embedding_dim: int = 384
 
     # --- Similaridade ---
