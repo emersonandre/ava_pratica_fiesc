@@ -25,7 +25,7 @@ from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
-from app.config import Settings, get_settings
+from app.settings import Settings, get_settings
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -129,9 +129,7 @@ def require_internal_key(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="INTERNAL_API_KEY nao configurada no servidor.",
         )
-    if x_internal_key is None or not hmac.compare_digest(
-        x_internal_key, settings.internal_api_key
-    ):
+    if x_internal_key is None or not hmac.compare_digest(x_internal_key, settings.internal_api_key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Cabecalho X-Internal-Key ausente ou invalido.",

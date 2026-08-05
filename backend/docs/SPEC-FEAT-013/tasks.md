@@ -8,7 +8,7 @@
 - [ ] Implementar middleware de tempo por etapa e log estruturado por requisição
 - [ ] Implementar tratamento de exceções de negócio
 - [ ] Configurar CORS a partir do `.env`
-- [ ] Implementar `/api/health` com verificação real de banco, índice e provider
+- [x] Implementar `/api/health` com verificação real de banco, índice e provider
 - [ ] Criar coleção de exemplos (`.http`) com uma chamada por rota, incluindo o fluxo de token
 
 ---

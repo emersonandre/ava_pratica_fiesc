@@ -40,11 +40,29 @@ extensão `pgvector`, evitando um segundo serviço só para busca vetorial.
 Os dois se encontram pela rede externa `prescritiva-net`. O frontend é reconstruído ou
 reiniciado sem tocar no banco, e o backend sobe sozinho para integração com sistemas da planta.
 
-- Configuração centralizada em `app/config.py` via `pydantic-settings`, lida de `.env`.
+- Configuração centralizada em `app/settings/` via `pydantic-settings`, lida de `.env`.
 - `.env.example` em cada app, documentando todas as variáveis.
-- `app/scripts/init_db.py`: cria extensão, schema e índices de forma idempotente.
-- `app/scripts/gen_secrets.py`: gera os segredos de autenticação (SPEC-FEAT-016).
-- `tasks.ps1` com os alvos: `up`, `down`, `init`, `ingest`, `api`, `test`.
+- `manage.py`: CLI administrativa única — `runserver`, `initdb`, `ingest`, `secrets`,
+  `report`, `check`, `shell`.
+- `scripts/init_db.py`: cria extensão, schema e índices de forma idempotente.
+- `scripts/gen_secrets.py`: gera os segredos de autenticação (SPEC-FEAT-016).
+
+### Estrutura em camadas
+
+Padrão MVC adaptado a uma API:
+
+| Camada | Papel |
+| --- | --- |
+| `controllers/` | Rotas HTTP: autenticação, validação, tradução para o serviço |
+| `services/` | Regra de negócio: similaridade, gate de cobertura, RAG, prescrição |
+| `repositories/` | Todas as consultas ao banco |
+| `models/` | Entidades e schema — um arquivo por tabela |
+| `schemas/` | Contratos de entrada e saída da API |
+| `core/` | Domínio puro (taxonomia, features), sem I/O |
+| `integrations/` | Fronteiras externas: LLM, embeddings, OCR |
+
+Regra que mantém a separação honesta: **um controller nunca monta consulta SQL, e um
+repositório nunca chama LLM.**
 """,
         fora_escopo="""
 - Orquestração em Kubernetes (fica descrita no documento de arquitetura, não implementada).
@@ -97,7 +115,7 @@ INTERNAL_API_KEY=                                    # interno  (SPEC-FEAT-016)
             "Implementar `app/db.py`: engine SQLAlchemy, sessão e verificação de conectividade",
             "Implementar `app/scripts/init_db.py` (extensão + tabelas + índices, idempotente)",
             "Implementar `app/scripts/gen_secrets.py` para gerar os segredos de autenticação",
-            "Criar `tasks.ps1` com alvos up/down/init/ingest/api/test",
+            "Implementar `manage.py` com os comandos administrativos",
             "Criar `.gitignore` cobrindo `.venv`, `.env`, `__pycache__`, artefatos de modelo",
             "Escrever os `Dockerfile` de backend e frontend",
             "Validar: subir do zero em máquina limpa e registrar o tempo no README",

@@ -1,6 +1,6 @@
 # Taxonomia canonica de falhas
 
-> Gerado por `python -m app.scripts.report_taxonomy` a partir de `dados/banner.csv`.
+> Gerado por `python manage.py report_taxonomy` a partir de `dados/banner.csv`.
 > Evidencia da [SPEC-FEAT-002](../SPEC-FEAT-002/spec.md).
 
 ## Resumo

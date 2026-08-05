@@ -36,9 +36,7 @@ from typing import Final
 # `pos`    -> reposicionamento do sensor
 # `novo`   / `antigo` -> versao do ensaio
 # numerico -> indice de repeticao
-SESSION_TOKENS: Final[frozenset[str]] = frozenset(
-    {"new", "novo", "antigo", "carga", "adxl", "pos"}
-)
+SESSION_TOKENS: Final[frozenset[str]] = frozenset({"new", "novo", "antigo", "carga", "adxl", "pos"})
 
 # `teste` tambem e um estado valido por si so. E descartado como token de sessao,
 # mas se o rotulo inteiro se resumir a ele, o resultado e o estado `teste`.
@@ -111,9 +109,7 @@ CORE_ALIASES: Final[dict[str, str]] = {
 }
 
 # Familias que representam problema (universo da prescricao).
-PROBLEM_FAMILIES: Final[frozenset[str]] = frozenset(
-    {family for _, family in CORE_MAP.values()}
-)
+PROBLEM_FAMILIES: Final[frozenset[str]] = frozenset({family for _, family in CORE_MAP.values()})
 
 # Familias que representam estado do sistema (secao 6 do enunciado).
 STATE_FAMILIES: Final[frozenset[str]] = frozenset(NORMAL_STATES.values())
@@ -163,9 +159,7 @@ def _tokenize(raw: str) -> list[str]:
     return [
         token
         for token in tokens
-        if token not in SESSION_TOKENS
-        and token not in TEST_TOKENS
-        and not NUMERIC_RE.match(token)
+        if token not in SESSION_TOKENS and token not in TEST_TOKENS and not NUMERIC_RE.match(token)
     ]
 
 

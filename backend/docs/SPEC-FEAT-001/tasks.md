@@ -9,7 +9,7 @@
 - [x] Implementar `app/db.py`: engine SQLAlchemy, sessão e verificação de conectividade
 - [x] Implementar `app/scripts/init_db.py` (extensão + tabelas + índices, idempotente)
 - [x] Implementar `app/scripts/gen_secrets.py` para gerar os segredos de autenticação
-- [ ] Criar `tasks.ps1` com alvos up/down/init/ingest/api/test
+- [x] Implementar `manage.py` com os comandos administrativos
 - [x] Criar `.gitignore` cobrindo `.venv`, `.env`, `__pycache__`, artefatos de modelo
 - [ ] Escrever os `Dockerfile` de backend e frontend
 - [ ] Validar: subir do zero em máquina limpa e registrar o tempo no README

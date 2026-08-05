@@ -1,28 +1,20 @@
 """Cria extensao, tabelas e indices. Idempotente.
 
-    python -m app.scripts.init_db
-    python -m app.scripts.init_db --drop     # recria do zero
+python manage.py initdb
+python manage.py initdb --drop     # recria do zero
 """
 
 from __future__ import annotations
 
-import argparse
-
 from sqlalchemy import text
 
-from app.config import get_settings
 from app.core.features import FEATURE_DIM
-from app.db import get_engine
+from app.database import get_engine
 from app.models import Base
+from app.settings import get_settings
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--drop", action="store_true", help="derruba as tabelas antes de recriar"
-    )
-    args = parser.parse_args()
-
+def run(*, drop: bool = False) -> int:
     settings = get_settings()
     engine = get_engine()
 
@@ -34,24 +26,24 @@ def main() -> int:
         ).scalar_one()
         print(f"pgvector       {versao}")
 
-    if args.drop:
+    if drop:
         Base.metadata.drop_all(engine)
         print("tabelas        removidas")
 
     Base.metadata.create_all(engine)
 
     with engine.connect() as connection:
-        tabelas = connection.execute(
-            text(
-                "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename"
+        tabelas = (
+            connection.execute(
+                text(
+                    "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename"
+                )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
 
     print(f"vetor sensor   {FEATURE_DIM} dimensoes")
     print(f"vetor doc      {settings.embedding_dim} dimensoes ({settings.embedding_model})")
     print(f"tabelas        {', '.join(tabelas)}")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
