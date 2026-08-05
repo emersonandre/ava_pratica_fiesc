@@ -22,6 +22,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.controllers import health
 from app.settings import get_settings
@@ -72,6 +73,15 @@ def create_app() -> FastAPI:
     )
 
     application.include_router(health.router)
+
+    @application.get("/", include_in_schema=False)
+    def raiz() -> RedirectResponse:
+        """A raiz nao serve conteudo -- manda para a documentacao interativa.
+
+        Sem isso, abrir a URL do servico no navegador devolve 404 e parece que a
+        API nao subiu.
+        """
+        return RedirectResponse(url="/docs")
 
     return application
 
