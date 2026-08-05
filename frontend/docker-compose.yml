@@ -15,7 +15,7 @@ services:
       args:
         # Injetado no build: o navegador do usuario fala com a API pelo host,
         # nao pelo nome do servico interno do compose.
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8001}
     container_name: prescritiva-web
     restart: unless-stopped
     environment:

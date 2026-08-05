@@ -227,7 +227,7 @@ python manage.py report                 # relatórios de análise
 
 # 5. Verificação e execução
 python manage.py check                  # banco, dados, scaler, LLM, segredos
-python manage.py runserver --reload     # http://localhost:8000/docs
+python manage.py runserver --reload     # http://127.0.0.1:8001/docs
 pytest -q
 ```
 
