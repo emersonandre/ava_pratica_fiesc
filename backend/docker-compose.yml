@@ -1,0 +1,63 @@
+# Stack do backend: banco vetorial + API.
+# O frontend sobe pelo seu proprio compose (frontend/docker-compose.yml) e
+# alcanca a API pela rede externa compartilhada.
+#
+#   docker network create prescritiva-net     # uma vez
+#   docker compose -f backend/docker-compose.yml up -d
+
+name: prescritiva-backend
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: prescritiva-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-prescritiva}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prescritiva}
+      POSTGRES_DB: ${POSTGRES_DB:-prescritiva}
+    ports:
+      # 5433 no host para nao colidir com um PostgreSQL ja instalado na 5432
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-prescritiva} -d ${POSTGRES_DB:-prescritiva}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - prescritiva
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prescritiva-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Dentro da rede do compose o banco atende pelo nome do servico, na 5432.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-prescritiva}:${POSTGRES_PASSWORD:-prescritiva}@db:5432/${POSTGRES_DB:-prescritiva}
+      API_HOST: 0.0.0.0
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Dados e documentos de origem, mais os artefatos gerados (scaler, cache de OCR).
+      - ../dados:/app/dados:ro
+      - ../arquivos:/app/arquivos:ro
+      - ./artifacts:/app/backend/artifacts
+    networks:
+      - prescritiva
+
+volumes:
+  pgdata:
+
+networks:
+  prescritiva:
+    name: prescritiva-net
+    external: true
