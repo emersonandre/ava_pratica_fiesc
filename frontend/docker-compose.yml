@@ -1,0 +1,34 @@
+# Stack do frontend. Container proprio, ciclo de vida proprio.
+# Depende do backend apenas pela rede externa compartilhada -- pode subir,
+# reiniciar ou ser reconstruido sem tocar no banco nem na API.
+#
+#   docker network create prescritiva-net     # uma vez
+#   docker compose -f frontend/docker-compose.yml up -d
+
+name: prescritiva-frontend
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Injetado no build: o navegador do usuario fala com a API pelo host,
+        # nao pelo nome do servico interno do compose.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    container_name: prescritiva-web
+    restart: unless-stopped
+    environment:
+      # Chave de comunicacao interna frontend -> backend. O proxy do nginx a
+      # injeta no cabecalho; ela nunca chega ao navegador.
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+      API_UPSTREAM: ${API_UPSTREAM:-http://prescritiva-api:8000}
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    networks:
+      - prescritiva
+
+networks:
+  prescritiva:
+    name: prescritiva-net
+    external: true

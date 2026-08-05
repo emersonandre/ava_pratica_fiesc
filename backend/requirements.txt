@@ -1,0 +1,30 @@
+# Versoes exatas em requirements.lock.txt (gerado via pip freeze)
+
+# --- API ---
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-multipart
+pyjwt
+
+# --- Banco de dados ---
+SQLAlchemy
+psycopg[binary]
+pgvector
+
+# --- Dados / ML ---
+pandas
+numpy
+scikit-learn
+joblib
+
+# --- Documentos / RAG ---
+pypdf
+pypdfium2
+Pillow
+fastembed
+
+# --- LLM (OpenAI e DeepSeek falam o mesmo protocolo) ---
+openai
+tenacity
