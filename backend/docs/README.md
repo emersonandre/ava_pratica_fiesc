@@ -11,8 +11,8 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | | |
 | --- | --- |
 | Features | 16 |
-| Features concluídas | 1 |
-| Tarefas concluídas | 30 / 112 (27%) |
+| Features concluídas | 2 |
+| Tarefas concluídas | 42 / 112 (38%) |
 
 ## Infraestrutura e dados
 
@@ -20,14 +20,14 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | :---: | --- | :---: | :---: |
 | 🟨 | [SPEC-FEAT-001 — Infraestrutura local reproduzível](SPEC-FEAT-001/spec.md) | 9/11 | 3/6 |
 | ✅ | [SPEC-FEAT-002 — Taxonomia canônica de falhas](SPEC-FEAT-002/spec.md) | 7/7 | 7/7 |
-| 🟨 | [SPEC-FEAT-003 — Feature engineering dos sinais de vibração](SPEC-FEAT-003/spec.md) | 4/6 | 3/6 |
-| 🟨 | [SPEC-FEAT-004 — Ingestão do banner.csv com split temporal](SPEC-FEAT-004/spec.md) | 5/7 | 6/7 |
+| ✅ | [SPEC-FEAT-003 — Feature engineering dos sinais de vibração](SPEC-FEAT-003/spec.md) | 6/6 | 6/6 |
+| 🟨 | [SPEC-FEAT-004 — Ingestão do banner.csv com split temporal](SPEC-FEAT-004/spec.md) | 6/7 | 6/7 |
 
 ## Similaridade e documentos
 
 | Status | Feature | Tarefas | Aceite |
 | :---: | --- | :---: | :---: |
-| ⬜ | [SPEC-FEAT-005 — Motor de similaridade histórica](SPEC-FEAT-005/spec.md) | 0/7 | 0/6 |
+| 🟨 | [SPEC-FEAT-005 — Motor de similaridade histórica](SPEC-FEAT-005/spec.md) | 6/7 | 4/6 |
 | ⬜ | [SPEC-FEAT-006 — Extração de texto e OCR dos documentos](SPEC-FEAT-006/spec.md) | 0/7 | 0/6 |
 | ⬜ | [SPEC-FEAT-007 — Indexação semântica dos documentos](SPEC-FEAT-007/spec.md) | 0/7 | 0/6 |
 | ⬜ | [SPEC-FEAT-008 — Mapa falha→documento e gate de cobertura](SPEC-FEAT-008/spec.md) | 0/7 | 0/7 |
@@ -45,7 +45,7 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 
 | Status | Feature | Tarefas | Aceite |
 | :---: | --- | :---: | :---: |
-| 🟨 | [SPEC-FEAT-013 — API REST](SPEC-FEAT-013/spec.md) | 1/8 | 1/9 |
+| 🟨 | [SPEC-FEAT-013 — API REST](SPEC-FEAT-013/spec.md) | 2/8 | 1/9 |
 | ⬜ | [SPEC-FEAT-014 — Registro de novo documento de falha](SPEC-FEAT-014/spec.md) | 0/7 | 0/6 |
-| 🟨 | [SPEC-FEAT-016 — Autenticação: JWT externo e chave interna](SPEC-FEAT-016/spec.md) | 4/8 | 0/9 |
+| 🟨 | [SPEC-FEAT-016 — Autenticação: JWT externo e chave interna](SPEC-FEAT-016/spec.md) | 6/8 | 0/9 |
 | ⬜ | [SPEC-FEAT-015 — Testes, qualidade e observabilidade](SPEC-FEAT-015/spec.md) | 0/6 | 0/6 |

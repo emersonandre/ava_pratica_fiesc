@@ -52,7 +52,10 @@ class Settings(BaseSettings):
 
     # --- Similaridade ---
     similarity_k: int = 50
-    ood_distance_threshold: float = 0.35
+    # Concordancia minima da vizinhanca para o sistema emitir diagnostico.
+    # Calibrado em docs/analise/similaridade.md -- distancia se mostrou um sinal
+    # ruim de confianca, concordancia nao.
+    similarity_confidence_min: float = 0.70
 
     # --- API ---
     api_host: str = "127.0.0.1"

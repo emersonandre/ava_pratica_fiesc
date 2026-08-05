@@ -24,14 +24,35 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-# Ordem estavel: define o layout do vetor gravado no banco. Alterar esta tupla
-# exige reingerir os dados e recriar o indice.
-FEATURE_COLUMNS: Final[tuple[str, ...]] = (
-    # Velocidade de vibracao -- severidade global (norma ISO 10816)
+# Colunas metricas persistidas para exibicao e analise. Nem todas entram no vetor.
+METRIC_COLUMNS: Final[tuple[str, ...]] = (
     "z_rms_velocity_mm_s",
     "x_rms_velocity_mm_s",
     "z_peak_velocity_mm_s",
     "x_peak_velocity_mm_s",
+    "z_peak_acceleration_g",
+    "x_peak_acceleration_g",
+    "z_rms_acceleration_g",
+    "x_rms_acceleration_g",
+    "z_high_freq_rms_accel_g",
+    "x_high_freq_rms_accel_g",
+    "z_kurtosis",
+    "x_kurtosis",
+    "z_crest_factor",
+    "x_crest_factor",
+    "z_peak_vel_comp_freq_hz",
+    "x_peak_vel_comp_freq_hz",
+    "temperature_c",
+    "rpm",
+)
+
+# Ordem estavel: define o layout do vetor gravado no banco. Alterar esta tupla
+# exige reingerir os dados e recriar o indice.
+FEATURE_COLUMNS: Final[tuple[str, ...]] = (
+    # Velocidade de vibracao -- severidade global (norma ISO 10816).
+    # Apenas o RMS: o pico e derivado (ver REDUNDANT_COLUMNS).
+    "z_rms_velocity_mm_s",
+    "x_rms_velocity_mm_s",
     # Aceleracao -- sensivel a impacto e alta frequencia
     "z_peak_acceleration_g",
     "x_peak_acceleration_g",
@@ -55,12 +76,25 @@ FEATURE_COLUMNS: Final[tuple[str, ...]] = (
 FEATURE_DIM: Final[int] = len(FEATURE_COLUMNS)
 
 # Descartadas por serem transformacao linear exata de uma coluna mantida.
+#
+# Conversao de unidade (razao 25,4 e relacao afim), correlacao >= 0,999999:
+#   z_rms_velocity_in_s, x_rms_velocity_in_s, z_peak_velocity_in_s,
+#   x_peak_velocity_in_s, temperature_f
+#
+# Coluna DERIVADA, nao medida -- correlacao 1,000000 com a de RMS:
+#   z_peak_velocity_mm_s = z_rms_velocity_mm_s x 1,41433  (sqrt(2) = 1,41421)
+#   x_peak_velocity_mm_s = x_rms_velocity_mm_s x 1,41430
+# O firmware do sensor calcula o pico de velocidade assumindo sinal senoidal,
+# entao a coluna nao carrega informacao alem do RMS. Mantida em METRIC_COLUMNS
+# para exibicao, fora do vetor para nao dobrar o peso da velocidade na distancia.
 REDUNDANT_COLUMNS: Final[tuple[str, ...]] = (
     "z_rms_velocity_in_s",
     "x_rms_velocity_in_s",
     "z_peak_velocity_in_s",
     "x_peak_velocity_in_s",
     "temperature_f",
+    "z_peak_velocity_mm_s",
+    "x_peak_velocity_mm_s",
 )
 
 SCALER_FILENAME: Final[str] = "scaler.joblib"

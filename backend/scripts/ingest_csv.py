@@ -33,7 +33,7 @@ from app.settings import get_settings
 HOLDOUT_START = datetime(2026, 6, 10, tzinfo=UTC)
 
 # Colunas metricas persistidas alem do vetor (para exibicao e analise).
-STORED_COLUMNS = feat.FEATURE_COLUMNS
+STORED_COLUMNS = feat.METRIC_COLUMNS
 
 # O protocolo do PostgreSQL aceita no maximo 65535 parametros por comando.
 # 7 colunas de identificacao/rotulo + as metricas + o vetor.

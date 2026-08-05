@@ -9,13 +9,66 @@ Todos rodam a partir de `backend/`, com a venv ativa.
 python manage.py secrets
 # cole a saida em backend/.env; a INTERNAL_API_KEY vai tambem em frontend/.env
 
-# 2. Banco (container Docker local, porta 5433)
+# 2. Banco PostgreSQL + pgvector (container Docker local, porta 5433)
 docker network create prescritiva-net
 docker compose up -d db
 
 # 3. Schema e dados
-python manage.py initdb
+python manage.py initdb        # CREATE EXTENSION vector + tabelas + indices HNSW
 python manage.py ingest        # ~167 mil registros, alguns minutos
+```
+
+## Criar o banco PostgreSQL + pgvector
+
+O jeito recomendado e o `docker compose up -d db` acima: ele ja traz usuario, senha,
+volume nomeado e healthcheck, e a porta 5433 (para nao colidir com um PostgreSQL
+instalado na 5432).
+
+```powershell
+docker network create prescritiva-net     # so na primeira vez
+docker compose up -d db
+docker compose ps                         # aguarde ficar "healthy"
+```
+
+### Sem compose, com `docker run`
+
+Equivalente manual, caso queira subir o container avulso:
+
+```powershell
+docker run -d `
+  --name prescritiva-db `
+  --network prescritiva-net `
+  -e POSTGRES_USER=prescritiva `
+  -e POSTGRES_PASSWORD=prescritiva `
+  -e POSTGRES_DB=prescritiva `
+  -p 5433:5432 `
+  -v pgdata_prescritiva:/var/lib/postgresql/data `
+  --health-cmd="pg_isready -U prescritiva -d prescritiva" `
+  --health-interval=5s `
+  pgvector/pgvector:pg17
+```
+
+> A imagem e a `pgvector/pgvector:pg17` -- PostgreSQL 17 com a extensao ja compilada.
+> Uma imagem `postgres:17` comum **nao** serve: `CREATE EXTENSION vector` falha porque
+> a extensao nao esta instalada.
+
+### Habilitar a extensao
+
+`python manage.py initdb` ja executa `CREATE EXTENSION IF NOT EXISTS vector` antes de
+criar as tabelas -- a extensao precisa existir para as colunas `vector(16)` e
+`vector(384)` serem criadas. Para fazer na mao:
+
+```powershell
+docker exec -it prescritiva-db psql -U prescritiva -d prescritiva -c "CREATE EXTENSION IF NOT EXISTS vector;"
+docker exec -it prescritiva-db psql -U prescritiva -d prescritiva -c "SELECT extversion FROM pg_extension WHERE extname='vector';"
+```
+
+### Conferir
+
+```powershell
+python manage.py check
+docker exec -it prescritiva-db psql -U prescritiva -d prescritiva -c "\dt"
+docker exec -it prescritiva-db psql -U prescritiva -d prescritiva -c "\di *hnsw*"
 ```
 
 ## Dia a dia

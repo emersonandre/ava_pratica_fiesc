@@ -94,9 +94,22 @@ Auditoria sobre os 166.796 registros:
 | `x_peak_velocity_in_s` × `x_peak_velocity_mm_s` | 1,000000 | 25,4056 |
 | `temperature_f` × `temperature_c` | 0,999999 | relação afim |
 
+E há uma redundância pior, que não é de unidade: **`peak_velocity` é uma coluna derivada, não
+medida.**
+
+| Par | Correlação | Razão |
+| --- | ---: | ---: |
+| `z_rms_velocity_mm_s` × `z_peak_velocity_mm_s` | 1,000000 | 1,414334 |
+| `x_rms_velocity_mm_s` × `x_peak_velocity_mm_s` | 1,000000 | 1,414297 |
+
+A razão é √2 = 1,414214, com desvio da ordem de 10⁻⁴. O firmware do sensor calcula o pico de
+velocidade a partir do RMS assumindo sinal senoidal — a coluna não carrega nenhuma informação
+além do RMS.
+
 Mantê-las daria peso dobrado a velocidade e temperatura no cálculo de distância. As colunas
 métricas ainda têm mais precisão armazenada (`mm_s` tem 3.568 valores distintos contra 1.954
-em `in_s` — o valor imperial é o arredondado). Vetor final: **18 dimensões**.
+em `in_s` — o valor imperial é o arredondado). Vetor final: **16 dimensões**; as derivadas
+seguem persistidas para exibição, apenas fora do vetor.
 
 ### 2.3 O dataset traz um holdout temporal pronto
 
@@ -338,12 +351,59 @@ marcados — e um critério só é marcado após verificação prática.
 | **M4** | API completa, upload de documento, frontend | pendente |
 | **M5** | Documentação de arquitetura, roteiro de demonstração | pendente |
 
-### Ponto de atenção registrado
+---
 
-A primeira medição do KNN sobre o holdout mostrou **acerto baixo**, apesar de similaridades
-altas (0,90–0,99). A hipótese é *domain shift*: as sessões `new_*` usaram outro acelerômetro
-(sufixo `adxl` nos rótulos) ou outra montagem, deslocando a distribuição das features.
+## 8. O resultado do motor de similaridade
 
-Está registrado como trabalho da SPEC-FEAT-005, que inclui calibração e limiar de fora de
-distribuição. O resultado será reportado como medido, com matriz de confusão por família —
-sem seleção de amostra favorável.
+Reportado como medido. Relatório completo e reproduzível em
+[`backend/docs/analise/similaridade.md`](backend/docs/analise/similaridade.md)
+(`python manage.py report similaridade`).
+
+**Acurácia bruta no holdout: 40,2%** sobre 3.000 eventos. Três investigações explicam o número
+e definem o desenho da solução.
+
+### `falta_fase` não tem histórico
+
+800 registros no holdout, **zero no treino**. Nenhuma busca por similaridade poderia acertá-la.
+O comportamento correto não é adivinhar — é recusar. O mesmo vale para `baseline` (69 eventos).
+
+### O teto é dos dados, não do método
+
+| Modelo | Treino | Holdout |
+| --- | ---: | ---: |
+| KNN por similaridade (k=50) | — | 40,2% |
+| HistGradientBoosting (200 iterações) | 78,8% | 39,8% |
+
+Um classificador supervisionado chega exatamente ao mesmo lugar. Existe deslocamento de
+distribuição real entre o histórico e as sessões `new_*`: as médias padronizadas da família
+`rolamento` deslocam 0,45 desvios em média (1,46 na temperatura), e o holdout opera em um
+regime de RPM praticamente ausente do histórico.
+
+### Distância é um péssimo sinal de confiança
+
+Foi a descoberta que mudou o desenho. O plano original era usar distância ao vizinho mais
+próximo como detector de fora de distribuição. A medição mostrou o oposto do esperado:
+
+| Portão | Cobertura | Precisão |
+| --- | ---: | ---: |
+| sem portão | 100% | 40,2% |
+| distância ≤ 0,5 | 13% | **18,4%** |
+| concordância ≥ 0,70 | 46,7% | 59,2% |
+| concordância ≥ 0,95 | 19,2% | **73,4%** |
+
+Quanto *mais próximo* o vizinho, *pior* a precisão. Os vizinhos mais próximos caem no cluster
+dominante de `rolamento` (36% do histórico) — proximidade alta muitas vezes significa absorção
+pela classe majoritária. Ter seguido o plano original produziria alta confiança exatamente nos
+casos mais enviesados.
+
+O sinal que funciona é a **concordância da vizinhança**. É o que o sistema usa.
+
+### Por isso a abstenção é o comportamento correto
+
+Prescrever intervenção física em equipamento com 40% de acerto é pior que admitir
+desconhecimento. Com o limiar configurado (0,70), o sistema diagnostica 47% dos casos a 59% de
+precisão e se abstém no resto — entregando mesmo assim os eventos similares, a distribuição
+temporal e o contexto operacional para análise humana. E recusa 59% dos eventos de
+`falta_fase`, a família que não tem como acertar.
+
+O limiar é uma escolha explícita e mensurável, ajustável em `SIMILARITY_CONFIDENCE_MIN`.

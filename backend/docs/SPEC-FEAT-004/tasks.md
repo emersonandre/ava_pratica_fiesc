@@ -7,7 +7,7 @@
 - [x] Aplicar taxonomia e features; abortar em rótulo desconhecido
 - [x] Implementar a regra de split e validá-la contra as datas reais
 - [x] Criar o índice HNSW e medir a latência de KNN antes/depois
-- [ ] Implementar upsert por `id` e testar a reexecução
+- [x] Implementar upsert por `id` e testar a reexecução
 - [ ] Gerar `backend/docs/analise/dataset.md` com contagens, período e distribuição por família
 
 ---
