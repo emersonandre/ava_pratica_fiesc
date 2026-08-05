@@ -3,20 +3,20 @@
 **Feature:** Indexação semântica dos documentos  
 Marque um item apenas quando ele tiver sido **verificado na prática**, não quando o código parecer pronto.
 
-- [ ] **Recuperação faz sentido no domínio**
+- [x] **Recuperação faz sentido no domínio**
   - *Verificação:* A consulta "como corrigir desalinhamento de motor" retorna trechos do Doc2 nas primeiras posições.
 
-- [ ] **Chunks não cortam procedimento ao meio**
+- [x] **Chunks não cortam procedimento ao meio**
   - *Verificação:* Inspeção dos chunks das seções de procedimento mostra passos completos; caso de teste registrado.
 
 - [ ] **Indexação roda em CPU em tempo aceitável**
   - *Verificação:* A indexação completa dos 6 documentos termina em menos de 2 minutos, sem GPU, e o tempo fica no README.
 
-- [ ] **Reindexação é idempotente**
+- [x] **Reindexação é idempotente**
   - *Verificação:* Rodar a indexação duas vezes mantém a contagem de chunks.
 
-- [ ] **Índice é autodescritivo**
+- [x] **Índice é autodescritivo**
   - *Verificação:* O modelo de embedding e a dimensão estão gravados em tabela de metadados; divergência de dimensão é bloqueada com erro claro.
 
-- [ ] **Sem chamada de rede**
+- [x] **Sem chamada de rede**
   - *Verificação:* A indexação completa com a rede desativada termina com sucesso.

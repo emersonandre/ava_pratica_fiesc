@@ -7,6 +7,7 @@ Comandos:
     runserver     Sobe a API (uvicorn)
     initdb        Cria extensao, tabelas e indices (idempotente)
     ingest        Ingere o dados/banner.csv em sensor_events
+    ingest-docs   Indexa os PDFs de arquivos/ no banco vetorial
     secrets       Gera segredos de autenticacao para colar no .env
     report        Gera os relatorios de analise em docs/analise/
     check         Verifica configuracao, banco e artefatos
@@ -58,6 +59,12 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     return run(limit=args.limit)
 
 
+def cmd_ingest_docs(args: argparse.Namespace) -> int:
+    from scripts.ingest_docs import run
+
+    return run(forcar=args.force)
+
+
 def cmd_secrets(_: argparse.Namespace) -> int:
     from scripts.gen_secrets import run
 
@@ -65,10 +72,15 @@ def cmd_secrets(_: argparse.Namespace) -> int:
 
 
 def cmd_report(args: argparse.Namespace) -> int:
+    from scripts.report_documents import run as run_documentos
     from scripts.report_similarity import run as run_similaridade
     from scripts.report_taxonomy import run as run_taxonomy
 
-    relatorios = {"taxonomia": run_taxonomy, "similaridade": run_similaridade}
+    relatorios = {
+        "taxonomia": run_taxonomy,
+        "similaridade": run_similaridade,
+        "documentos": run_documentos,
+    }
     alvos = relatorios if args.nome == "all" else {args.nome: relatorios[args.nome]}
     for nome, funcao in alvos.items():
         print(f"-- {nome}")
@@ -155,11 +167,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit", type=int, default=None, help="ingere apenas N linhas")
     p.set_defaults(func=cmd_ingest)
 
+    p = sub.add_parser("ingest-docs", help="indexa os PDFs de arquivos/")
+    p.add_argument("--force", action="store_true", help="reindexa mesmo se ja existir")
+    p.set_defaults(func=cmd_ingest_docs)
+
     p = sub.add_parser("secrets", help="gera segredos de autenticacao")
     p.set_defaults(func=cmd_secrets)
 
     p = sub.add_parser("report", help="gera relatorios de analise")
-    p.add_argument("nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade"])
+    p.add_argument("nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade", "documentos"])
     p.set_defaults(func=cmd_report)
 
     p = sub.add_parser("check", help="verifica configuracao, banco e artefatos")

@@ -2,13 +2,13 @@
 
 **Feature:** Indexação semântica dos documentos
 
-- [ ] Definir schema de `documents` e `document_chunks`
-- [ ] Implementar `app/docs/chunking.py` com detecção de seções numeradas + fallback por tamanho
-- [ ] Implementar `app/rag/embeddings.py` encapsulando o `fastembed`
-- [ ] Implementar `app/scripts/ingest_docs.py` (extrai → chunka → embeda → grava)
-- [ ] Criar índice HNSW e tabela de metadados do índice
-- [ ] Testar recuperação com 5 consultas-sonda, uma por documento conhecido
-- [ ] Medir e registrar o tempo de indexação em CPU
+- [x] Definir schema de `documents` e `document_chunks`
+- [x] Implementar `app/docs/chunking.py` com detecção de seções numeradas + fallback por tamanho
+- [x] Implementar `app/rag/embeddings.py` encapsulando o `fastembed`
+- [x] Implementar `app/scripts/ingest_docs.py` (extrai → chunka → embeda → grava)
+- [x] Criar índice HNSW e tabela de metadados do índice
+- [x] Testar recuperação com 5 consultas-sonda, uma por documento conhecido
+- [x] Medir e registrar o tempo de indexação em CPU
 
 ---
 

@@ -2,12 +2,12 @@
 
 **Feature:** Provider de LLM plugável
 
-- [ ] Implementar `app/llm/provider.py` com o protocolo e a implementação OpenAI-compatível
-- [ ] Adicionar resolução por `.env` e declaração de capacidades (visão)
-- [ ] Adicionar timeout, retry com `tenacity` e teto de tokens
-- [ ] Implementar log estruturado de uso (tokens, latência, custo estimado)
-- [ ] Mapear exceções do SDK para erros de negócio da API
-- [ ] Testar com provider inválido e confirmar degradação controlada
+- [x] Implementar `app/llm/provider.py` com o protocolo e a implementação OpenAI-compatível
+- [x] Adicionar resolução por `.env` e declaração de capacidades (visão)
+- [x] Adicionar timeout, retry com `tenacity` e teto de tokens
+- [x] Implementar log estruturado de uso (tokens, latência, custo estimado)
+- [x] Mapear exceções do SDK para erros de negócio da API
+- [x] Testar com provider inválido e confirmar degradação controlada
 
 ---
 
