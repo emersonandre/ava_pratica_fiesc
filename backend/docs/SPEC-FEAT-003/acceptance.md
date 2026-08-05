@@ -9,13 +9,13 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Vetor final sem duplicidade de grandeza**
   - *Verificação:* `FEATURE_COLUMNS` não contém nenhuma coluna `_in_s` nem `temperature_f`.
 
-- [ ] **Ordem das features é estável**
+- [x] **Ordem das features é estável**
   - *Verificação:* `to_vector` produz o mesmo layout de `build_feature_frame`; teste compara índice a índice.
 
-- [ ] **Scaler é reutilizado, não reajustado**
+- [x] **Scaler é reutilizado, não reajustado**
   - *Verificação:* A inferência carrega `artifacts/scaler.joblib`; alterar o dado de entrada não altera média/desvio salvos.
 
-- [ ] **Motor desligado não contamina a escala**
+- [x] **Motor desligado não contamina a escala**
   - *Verificação:* A média de RPM do scaler ajustado é calculada sem os registros `motor_desligado`.
 
 - [x] **Sem NaN no vetor final**

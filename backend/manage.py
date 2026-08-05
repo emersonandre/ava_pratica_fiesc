@@ -65,9 +65,10 @@ def cmd_secrets(_: argparse.Namespace) -> int:
 
 
 def cmd_report(args: argparse.Namespace) -> int:
+    from scripts.report_similarity import run as run_similaridade
     from scripts.report_taxonomy import run as run_taxonomy
 
-    relatorios = {"taxonomia": run_taxonomy}
+    relatorios = {"taxonomia": run_taxonomy, "similaridade": run_similaridade}
     alvos = relatorios if args.nome == "all" else {args.nome: relatorios[args.nome]}
     for nome, funcao in alvos.items():
         print(f"-- {nome}")
@@ -158,7 +159,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_secrets)
 
     p = sub.add_parser("report", help="gera relatorios de analise")
-    p.add_argument("nome", nargs="?", default="all", choices=["all", "taxonomia"])
+    p.add_argument("nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade"])
     p.set_defaults(func=cmd_report)
 
     p = sub.add_parser("check", help="verifica configuracao, banco e artefatos")
