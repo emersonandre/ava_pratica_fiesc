@@ -1,6 +1,6 @@
 """Gera backend/docs/analise/taxonomia.md a partir do dataset real.
 
-    python -m app.scripts.report_taxonomy
+    python manage.py report_taxonomy
 
 O relatorio e a evidencia auditavel da SPEC-FEAT-002: mostra cada rotulo bruto,
 para onde ele foi mapeado e quantos registros isso representa.
@@ -10,9 +10,7 @@ from __future__ import annotations
 
 import csv
 from collections import Counter, defaultdict
-from pathlib import Path
 
-from app.config import PROJECT_ROOT, get_settings
 from app.core.taxonomy import (
     FAMILY_DESCRIPTIONS,
     PROBLEM_FAMILIES,
@@ -20,11 +18,12 @@ from app.core.taxonomy import (
     UnknownFaultLabel,
     normalize_fault,
 )
+from app.settings import PROJECT_ROOT, get_settings
 
 OUTPUT = PROJECT_ROOT / "backend" / "docs" / "analise" / "taxonomia.md"
 
 
-def main() -> int:
+def run() -> int:
     settings = get_settings()
     counts: Counter[str] = Counter()
     periods: dict[str, list[str]] = defaultdict(lambda: ["", ""])
@@ -60,7 +59,7 @@ def main() -> int:
     lines: list[str] = [
         "# Taxonomia canonica de falhas",
         "",
-        "> Gerado por `python -m app.scripts.report_taxonomy` a partir de `dados/banner.csv`.",
+        "> Gerado por `python manage.py report_taxonomy` a partir de `dados/banner.csv`.",
         "> Evidencia da [SPEC-FEAT-002](../SPEC-FEAT-002/spec.md).",
         "",
         "## Resumo",
@@ -129,7 +128,3 @@ def main() -> int:
     OUTPUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"{OUTPUT.relative_to(PROJECT_ROOT)}: {len(rows)} rotulos, {len(by_family)} familias")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

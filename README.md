@@ -212,21 +212,46 @@ pip install -r backend/requirements.txt
 
 # 2. Configuração
 copy backend\.env.example backend\.env
-cd backend && python -m app.scripts.gen_secrets
-# cole os segredos gerados em backend/.env e preencha LLM_API_KEY
+cd backend
+python manage.py secrets                # gera JWT_SECRET, credenciais e chave interna
+# cole os segredos em backend/.env e preencha LLM_API_KEY
 
 # 3. Banco
 docker network create prescritiva-net
-docker compose -f backend/docker-compose.yml up -d db
+docker compose -f docker-compose.yml up -d db
 
 # 4. Schema e dados
-python -m app.scripts.init_db
-python -m app.scripts.ingest_csv        # ~167 mil registros
-python -m app.scripts.report_taxonomy   # relatório auditável da taxonomia
+python manage.py initdb
+python manage.py ingest                 # ~167 mil registros
+python manage.py report                 # relatórios de análise
 
-# 5. Testes
+# 5. Verificação e execução
+python manage.py check                  # banco, dados, scaler, LLM, segredos
+python manage.py runserver --reload     # http://localhost:8000/docs
 pytest -q
 ```
+
+### `manage.py`
+
+FastAPI não tem um `manage.py` embutido como o Django. Este arquivo cumpre o mesmo papel:
+reunir as tarefas administrativas em um comando só, em vez de espalhar `python -m ...` pela
+documentação.
+
+| Comando | Função |
+| --- | --- |
+| `runserver` | Sobe a API (uvicorn) |
+| `initdb` | Cria extensão, tabelas e índices (idempotente) |
+| `ingest` | Ingere `dados/banner.csv` |
+| `secrets` | Gera segredos de autenticação |
+| `report` | Gera os relatórios de análise |
+| `check` | Verifica configuração, banco, dados e artefatos |
+| `shell` | REPL com sessão e modelos carregados |
+
+> `manage.py` **não** é `app/main.py`. `main.py` é o objeto ASGI que o uvicorn **importa**
+> (`uvicorn app.main:app`) — precisa ser importável sem efeito colateral, já que cada worker
+> o carrega. `manage.py` é uma CLI que você **executa**. Juntá-los faria todo worker HTTP
+> carregar o parser de argumentos, e `python main.py ingest` construiria a aplicação inteira
+> só para rodar um ETL.
 
 ---
 
@@ -234,15 +259,26 @@ pytest -q
 
 ```
 ├── backend/
+│   ├── manage.py               # CLI administrativa
 │   ├── app/
-│   │   ├── config.py           # configuração via .env (pydantic-settings)
-│   │   ├── db.py               # engine e sessão
-│   │   ├── models.py           # schema (sensor_events, documents, chunks, coverage)
-│   │   ├── security.py         # JWT externo + chave interna
-│   │   ├── core/
+│   │   ├── main.py             # fábrica da aplicação ASGI
+│   │   ├── settings/           # configuração via .env (pydantic-settings)
+│   │   ├── database/           # base declarativa, engine e sessão
+│   │   ├── models/             # entidades — um arquivo por tabela
+│   │   ├── schemas/            # contratos de entrada e saída da API
+│   │   ├── repositories/       # acesso a dados — todas as consultas
+│   │   ├── services/           # regra de negócio: similaridade, RAG, cobertura
+│   │   ├── controllers/
+│   │   │   ├── health.py       # público
+│   │   │   ├── v1/             # externo — JWT Bearer
+│   │   │   └── internal/       # interno — X-Internal-Key
+│   │   ├── core/               # domínio puro, sem I/O
 │   │   │   ├── taxonomy.py     # 151 rótulos → 14 famílias
 │   │   │   └── features.py     # vetor de 18 dimensões + scaler
-│   │   └── scripts/            # init_db, ingest_csv, gen_secrets, relatórios
+│   │   ├── integrations/       # fronteiras externas: LLM, embeddings, OCR
+│   │   ├── middleware/
+│   │   └── security/           # JWT externo + chave interna
+│   ├── scripts/                # ETL e relatórios, invocados pelo manage.py
 │   ├── docs/
 │   │   ├── README.md           # índice de specs com status
 │   │   ├── SPEC-FEAT-XXX/      # spec.md + acceptance.md + tasks.md
@@ -257,6 +293,21 @@ pytest -q
 ├── dados/                      # banner.csv
 └── arquivos/                   # Doc1..Doc6.pdf
 ```
+
+### Camadas
+
+Padrão MVC adaptado a uma API, com uma regra que mantém a separação honesta:
+**um controller nunca monta consulta SQL, e um repositório nunca chama LLM.**
+
+| Camada | Papel | Depende de |
+| --- | --- | --- |
+| `controllers/` | Traduz requisição HTTP em chamada de serviço. Autenticação e validação. | services, schemas |
+| `services/` | Regra de negócio: similaridade, gate de cobertura, RAG, prescrição. | repositories, core, integrations |
+| `repositories/` | Todas as consultas ao banco. | models, database |
+| `models/` | Entidades e schema (Model). | database |
+| `schemas/` | Contratos de entrada e saída (View). | — |
+| `core/` | Domínio puro: taxonomia e features. Sem I/O, testável isolado. | — |
+| `integrations/` | Fronteiras externas: LLM, embeddings, OCR. | settings |
 
 ### Método: spec-driven
 

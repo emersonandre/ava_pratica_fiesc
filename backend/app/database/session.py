@@ -9,7 +9,7 @@ from functools import lru_cache
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.config import get_settings
+from app.settings import get_settings
 
 
 @lru_cache

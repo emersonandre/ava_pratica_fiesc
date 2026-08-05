@@ -27,5 +27,5 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [ ] **CORS liberado para o frontend**
   - *Verificação:* O frontend em `localhost` chama a API pelo navegador sem erro de CORS.
 
-- [ ] **Health é honesto**
+- [x] **Health é honesto**
   - *Verificação:* `/api/health` reporta falha quando o banco está fora, em vez de responder OK.

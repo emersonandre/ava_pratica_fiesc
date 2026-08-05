@@ -12,7 +12,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Holdout corresponde aos rótulos `new_*`**
   - *Verificação:* Todo registro com `split='holdout'` tem `raw_fault` começando com `new_`, e vice-versa.
 
-- [ ] **Reexecução é idempotente**
+- [x] **Reexecução é idempotente**
   - *Verificação:* Rodar a ingestão duas vezes mantém a contagem em 166.796.
 
 - [x] **Busca vetorial é rápida**

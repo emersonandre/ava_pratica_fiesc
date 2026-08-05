@@ -138,7 +138,7 @@ def load_scaler(artifacts_dir: Path) -> StandardScaler:
     path = scaler_path(artifacts_dir)
     if not path.exists():
         raise FileNotFoundError(
-            f"{path} nao encontrado. Rode a ingestao (python -m app.scripts.ingest_csv) antes."
+            f"{path} nao encontrado. Rode a ingestao (python manage.py ingest) antes."
         )
     payload = joblib.load(path)
     if tuple(payload["columns"]) != FEATURE_COLUMNS:

@@ -1,6 +1,6 @@
 """Ingestao do banner.csv em sensor_events.
 
-    python -m app.scripts.ingest_csv
+    python manage.py ingest
 
 Etapas: le o CSV -> normaliza a taxonomia (SPEC-FEAT-002) -> define o split
 temporal -> ajusta e persiste o scaler (SPEC-FEAT-003) -> grava com upsert por id.
@@ -17,21 +17,20 @@ A regra e verificada contra as datas reais, nao assumida pelo nome.
 
 from __future__ import annotations
 
-import argparse
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pandas as pd
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
-from app.config import get_settings
 from app.core import features as feat
 from app.core.taxonomy import UnknownFaultLabel, normalize_fault
-from app.db import get_engine, session_scope
+from app.database import get_engine, session_scope
 from app.models import SensorEvent
+from app.settings import get_settings
 
 # Fronteira do holdout, confirmada na exploracao dos dados.
-HOLDOUT_START = datetime(2026, 6, 10, tzinfo=timezone.utc)
+HOLDOUT_START = datetime(2026, 6, 10, tzinfo=UTC)
 
 # Colunas metricas persistidas alem do vetor (para exibicao e analise).
 STORED_COLUMNS = feat.FEATURE_COLUMNS
@@ -58,9 +57,7 @@ def aplicar_taxonomia(df: pd.DataFrame) -> pd.DataFrame:
             resultado = normalize_fault(rotulo)
         except UnknownFaultLabel as erro:
             ids = df.loc[df["fault"] == rotulo, "id"].head(3).tolist()
-            raise SystemExit(
-                f"Ingestao abortada. {erro} Exemplos de id afetados: {ids}"
-            ) from erro
+            raise SystemExit(f"Ingestao abortada. {erro} Exemplos de id afetados: {ids}") from erro
         linhas.append(
             {
                 "fault": rotulo,
@@ -130,10 +127,7 @@ def gravar(df: pd.DataFrame, vetores) -> int:
             # Upsert por id: reexecutar a ingestao nao duplica nem falha.
             stmt = stmt.on_conflict_do_update(
                 index_elements=[SensorEvent.id],
-                set_={
-                    coluna: stmt.excluded[coluna]
-                    for coluna in [*colunas[1:], "features"]
-                },
+                set_={coluna: stmt.excluded[coluna] for coluna in [*colunas[1:], "features"]},
             )
             session.execute(stmt)
             total += len(lote)
@@ -162,17 +156,13 @@ def resumo() -> None:
         )
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--limit", type=int, default=None, help="ingere apenas N linhas")
-    args = parser.parse_args()
-
+def run(*, limit: int | None = None) -> int:
     settings = get_settings()
     print(f"origem         {settings.csv_path}")
 
     df = carregar_csv(settings.csv_path)
-    if args.limit:
-        df = df.head(args.limit)
+    if limit:
+        df = df.head(limit)
     print(f"linhas         {len(df):,}".replace(",", "."))
 
     df = aplicar_taxonomia(df)
@@ -195,7 +185,3 @@ def main() -> int:
 
     resumo()
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

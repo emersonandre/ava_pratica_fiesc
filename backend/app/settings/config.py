@@ -15,8 +15,8 @@ from typing import Literal
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# backend/app/config.py -> backend/app -> backend -> raiz do repositorio
-BACKEND_DIR = Path(__file__).resolve().parents[1]
+# backend/app/settings/config.py -> settings -> app -> backend -> raiz do repositorio
+BACKEND_DIR = Path(__file__).resolve().parents[2]
 PROJECT_ROOT = BACKEND_DIR.parent
 
 
@@ -134,7 +134,7 @@ class Settings(BaseSettings):
         if faltando:
             raise RuntimeError(
                 f"Variaveis de autenticacao ausentes: {', '.join(faltando)}. "
-                "Gere-as com `python -m app.scripts.gen_secrets` e preencha backend/.env."
+                "Gere-as com `python manage.py secrets` e preencha backend/.env."
             )
 
     def require_vision(self) -> None:
