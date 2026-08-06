@@ -38,6 +38,7 @@ ava_pratica_fiesc/
 ├── desafio.md              # enunciado original
 ├── estrutura.md            # este documento
 ├── ARQUITETURA.md          # arquitetura de solução e de implantação industrial
+├── ROTEIRO.md              # passo a passo da demonstração
 ├── commands.md             # passo a passo para subir e testar
 ├── README.md               # visão geral, decisões e execução
 └── .gitignore

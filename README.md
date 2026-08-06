@@ -378,7 +378,8 @@ O andamento por feature não é escrito à mão: sai da contagem de checkboxes e
 
 A arquitetura de implantação industrial — segmentação de rede ISA-95, dimensionamento,
 degradação, ciclo de vida do modelo e alternativas descartadas — está em
-[`ARQUITETURA.md`](ARQUITETURA.md).
+[`ARQUITETURA.md`](ARQUITETURA.md). O passo a passo da demonstração, com os números
+conferidos contra o sistema rodando, está em [`ROTEIRO.md`](ROTEIRO.md).
 
 ---
 
