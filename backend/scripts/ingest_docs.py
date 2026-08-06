@@ -82,7 +82,7 @@ def run(*, forcar: bool = False) -> int:
 
         for caminho in arquivos:
             familia, titulo, evidencia = COBERTURA.get(caminho.name, (None, caminho.stem, None))
-            resultado = indexar(session, caminho, familia=familia, titulo=titulo, forcar=forcar)
+            resultado = indexar(session, caminho, familia=familia, titulo=titulo, forcar=forcar, origem="manual")
             documento = resultado.documento
 
             if documento.status == "failed":

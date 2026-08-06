@@ -24,10 +24,19 @@ logger = logging.getLogger("prescritiva.indexacao")
 
 
 class ResultadoIndexacao:
-    def __init__(self, documento: Document, *, trechos: int, ja_existia: bool = False) -> None:
+    def __init__(
+        self,
+        documento: Document,
+        *,
+        trechos: int,
+        ja_existia: bool = False,
+        cobertura_nova: bool = False,
+    ) -> None:
         self.documento = documento
         self.trechos = trechos
         self.ja_existia = ja_existia
+        # Um documento ja indexado pode passar a cobrir uma familia NOVA.
+        self.cobertura_nova = cobertura_nova
 
 
 def _buscar_por_hash(session: Session, hash_conteudo: str) -> Document | None:
@@ -43,6 +52,7 @@ def indexar(
     familia: str | None = None,
     titulo: str | None = None,
     forcar: bool = False,
+    origem: str = "upload",
 ) -> ResultadoIndexacao:
     """Indexa um documento. Idempotente por hash de conteudo."""
     documento = Document(
@@ -69,8 +79,36 @@ def indexar(
 
     existente = _buscar_por_hash(session, extraido.hash_conteudo)
     if existente and not forcar:
-        logger.info("%s ja indexado (documento %d)", caminho.name, existente.id)
-        return ResultadoIndexacao(existente, trechos=len(existente.chunks), ja_existia=True)
+        # Deduplicar o CONTEUDO nao e o mesmo que deduplicar a COBERTURA: um
+        # procedimento pode legitimamente cobrir mais de uma familia de falha.
+        # Sem este trecho, registrar um documento ja existente para uma familia
+        # nova devolvia 201 e a familia continuava descoberta -- o ciclo de
+        # recusa nao fechava.
+        cobertura_nova = False
+        if familia:
+            ja_cobria = session.scalars(
+                select(FaultCoverage).where(
+                    FaultCoverage.fault_family == familia,
+                    FaultCoverage.document_id == existente.id,
+                )
+            ).one_or_none()
+            if ja_cobria is None:
+                vincular_cobertura(session, familia, existente, origem=origem)
+                cobertura_nova = True
+                logger.info(
+                    "documento %d passou a cobrir a familia %s",
+                    existente.id,
+                    familia,
+                )
+            session.flush()
+
+        return ResultadoIndexacao(
+            existente,
+            trechos=len(existente.chunks),
+            ja_existia=True,
+            cobertura_nova=cobertura_nova,
+        )
+
     if existente:
         # Reindexacao forcada: remove os trechos antigos para nao duplicar.
         session.delete(existente)
@@ -109,7 +147,7 @@ def indexar(
         )
 
     if familia:
-        vincular_cobertura(session, familia, documento, origem="upload")
+        vincular_cobertura(session, familia, documento, origem=origem)
 
     session.flush()
     logger.info(

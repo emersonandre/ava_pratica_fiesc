@@ -12,8 +12,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.controllers.v1 import predict as predict_controller
 from app.core.features import load_scaler, to_vector
 from app.database import get_session
+from app.schemas.predict import PredictRequest, PredictResponse
 from app.schemas.sensor_event import SensorEventIn, SensorEventOut
 from app.schemas.similarity import SimilarityResult
 from app.security import require_internal_key
@@ -49,6 +51,19 @@ def eventos_similares(
 
     vetor = to_vector(scaler, evento.to_feature_dict())
     return similarity.analisar(session, vetor.tolist(), k=k)
+
+
+@router.post("/events/analyze", response_model=PredictResponse)
+def analisar(
+    requisicao: PredictRequest,
+    session: Annotated[Session, Depends(get_session)],
+) -> PredictResponse:
+    """Mesma analise de `/api/v1/predict`, para o frontend.
+
+    Compartilha a implementacao com a rota externa -- nao ha um segundo caminho
+    que possa divergir no comportamento do gate.
+    """
+    return predict_controller.executar(session, requisicao)
 
 
 @router.get("/events/sample", response_model=SensorEventOut)

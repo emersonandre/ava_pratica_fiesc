@@ -243,6 +243,54 @@ $r = Invoke-RestMethod http://127.0.0.1:8001/api/internal/events/similar `
 $r.votos | Select-Object -First 3
 ```
 
+### Superfície externa, com JWT
+
+Os endpoints `/api/v1/*` são os consumidos por sistemas da planta. Exigem token:
+
+```powershell
+$id     = (Select-String -Path backend\.env -Pattern '^API_CLIENT_ID=(.+)$').Matches.Groups[1].Value
+$secret = (Select-String -Path backend\.env -Pattern '^API_CLIENT_SECRET=(.+)$').Matches.Groups[1].Value
+
+$tok = Invoke-RestMethod http://127.0.0.1:8001/api/v1/auth/token -Method Post `
+       -ContentType "application/json" `
+       -Body (@{ client_id = $id; client_secret = $secret } | ConvertTo-Json)
+
+$hj = @{ Authorization = "Bearer $($tok.access_token)" }
+
+# Análise completa: similaridade + documentos + LLM, em uma chamada
+$r = Invoke-RestMethod http://127.0.0.1:8001/api/v1/predict -Method Post -Headers $hj `
+     -ContentType "application/json" -Body ($evento | ConvertTo-Json)
+
+"família:    $($r.diagnostico.familia)  ($($r.diagnostico.confianca))"
+"cobertura:  $($r.cobertura.motivo)"
+"chamou LLM: $($r.chamou_llm)"
+if ($r.prescricao) {
+    "passos:     $($r.prescricao.correcao.Count) de correção"
+    "embasamento: $($r.prescricao.embasamento.score)"
+    $r.prescricao.correcao[0]
+} else {
+    "recusa:     $($r.recusa.motivo) — $($r.recusa.mensagem)"
+}
+```
+
+> A geração leva de **30 a 70 segundos** com o DeepSeek v4. É modelo de raciocínio:
+> gasta boa parte do orçamento de tokens "pensando" antes de escrever. Para
+> demonstrar só a camada de dados, use `/api/internal/events/similar`, que
+> responde em dezenas de milissegundos e não chama o modelo.
+
+### Registrar um novo documento
+
+Fecha o ciclo: falha sem documentação → recusa → upload → prescrição citada.
+
+```powershell
+$form = @{
+    file         = Get-Item ..\arquivos\Doc6.pdf
+    fault_family = "cocked_rotor"
+    title        = "Procedimento de Rotor Inclinado"
+}
+Invoke-RestMethod http://127.0.0.1:8001/api/v1/upload_doc -Method Post -Headers $hj -Form $form
+```
+
 ---
 
 ## Testes automatizados
