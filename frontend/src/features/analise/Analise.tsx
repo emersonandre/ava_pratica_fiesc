@@ -313,7 +313,6 @@ function Passo({
 function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verdade: string }) {
   const { diagnostico, cobertura } = resultado
   const acertou = diagnostico.familia === verdade
-  const vencedor = diagnostico.votos[0]
 
   return (
     <div className="cartao diagnostico">
@@ -337,30 +336,34 @@ function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verda
         </span>
       </div>
 
-      {/* Evidencia, concordancia e fonte em uma linha so: sao tres fatos curtos
-          sobre o mesmo diagnostico, nao tres paragrafos. */}
+      {/* Texto corrido, nao flex: o leitor precisa da frase, nao de tres dados
+          soltos. O numero em destaque carrega a informacao, o resto explica. */}
       <p className="diagnostico-meta">
         {diagnostico.familia ? (
           <>
-            <b>{vencedor?.vizinhos ?? 0}</b> de {resultado.vizinhos.length} leituras
-            parecidas
-            <span className="diagnostico-sep">·</span>
-            <b>{porcento(diagnostico.confianca)}</b> de concordância
+            <b>{porcento(diagnostico.confianca)}</b> das{' '}
+            <b>{resultado.vizinhos.length}</b> leituras mais parecidas do histórico
+            apresentavam esta mesma falha.
           </>
         ) : (
           <>
-            leituras parecidas não concordam entre si — a mais votada reúne{' '}
-            <b>{porcento(diagnostico.confianca)}</b>
+            Nenhuma falha reúne mais de <b>{porcento(diagnostico.confianca)}</b> das{' '}
+            <b>{resultado.vizinhos.length}</b> leituras mais parecidas. O sinal não é
+            conclusivo, e o sistema prefere não opinar.
           </>
         )}
-        {cobertura.coberta &&
-          cobertura.documentos.map((documento) => (
-            <span key={documento.arquivo}>
-              <span className="diagnostico-sep">·</span>
-              <span className="distintivo distintivo--acento">{documento.arquivo}</span>
+      </p>
+
+      {cobertura.coberta && (
+        <p className="diagnostico-fonte">
+          Procedimento cadastrado:{' '}
+          {cobertura.documentos.map((documento) => (
+            <span key={documento.arquivo} className="distintivo distintivo--acento">
+              {documento.arquivo}
             </span>
           ))}
-      </p>
+        </p>
+      )}
 
       <div className="votacao">
         <div className="votacao-barra">
