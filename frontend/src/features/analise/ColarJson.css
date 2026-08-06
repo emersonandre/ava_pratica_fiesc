@@ -1,0 +1,20 @@
+.colar { padding: var(--e5); margin-bottom: var(--e4); }
+.colar-topo {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--e4); margin-bottom: var(--e4);
+}
+.colar-topo p { margin-top: var(--e1); font-size: 0.8125rem; max-width: 62ch; }
+.colar-topo code {
+  font-family: var(--fonte-dado); font-size: 0.75rem;
+  padding: 0 var(--e1); border-radius: 3px; background: var(--superficie-3);
+}
+.colar textarea {
+  width: 100%; resize: vertical;
+  font-family: var(--fonte-dado); font-size: 0.75rem; line-height: 1.6;
+}
+.colar-erro {
+  margin-top: var(--e3); padding: var(--e3) var(--e4);
+  background: var(--perigo-fundo); color: var(--perigo);
+  border-radius: var(--raio-p); font-size: 0.8125rem;
+}
+.colar-acoes { display: flex; gap: var(--e3); margin-top: var(--e4); flex-wrap: wrap; }

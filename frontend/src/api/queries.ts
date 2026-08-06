@@ -95,7 +95,11 @@ export function useAmostra() {
 export function useAnalisar() {
   return useMutation({
     mutationFn: (
-      evento: EventoSensor & { confianca_minima?: number; gerar_prescricao?: boolean },
+      evento: EventoSensor & {
+        fault?: string
+        confianca_minima?: number
+        gerar_prescricao?: boolean
+      },
     ) =>
       enviar<RespostaAnalise>('/api/internal/events/analyze', evento),
   })

@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.features import MissingFeatureError
+from app.core.taxonomy import UnknownFaultLabel, normalize_fault
 from app.database import get_session
 from app.schemas.predict import (
     CoberturaOut,
@@ -33,15 +34,32 @@ logger = logging.getLogger("prescritiva.api")
 router = APIRouter(prefix="/api/v1", tags=["v1"])
 
 
-def montar_resposta(resultado: ResultadoAnalise) -> PredictResponse:
+def montar_resposta(
+    resultado: ResultadoAnalise, *, rotulo_bruto: str | None = None
+) -> PredictResponse:
     """Traducao do resultado do pipeline para o contrato publico."""
     similaridade = resultado.similaridade
+
+    # O gabarito e normalizado aqui, nao no cliente: a taxonomia vive no backend,
+    # e ninguem de fora tem como saber que `cocked_rotor_2` e `cocked_rotor`.
+    rotulo_real = None
+    if rotulo_bruto:
+        try:
+            rotulo_real = normalize_fault(rotulo_bruto).family
+        except UnknownFaultLabel:
+            rotulo_real = None
     cobertura = resultado.cobertura
     prescricao = resultado.resposta if isinstance(resultado.resposta, Prescricao) else None
 
     return PredictResponse(
         diagnostico=DiagnosticoOut(
             familia=similaridade.familia_diagnosticada,
+            rotulo_real=rotulo_real,
+            acertou=(
+                similaridade.familia_diagnosticada == rotulo_real
+                if rotulo_real is not None
+                else None
+            ),
             hipotese=similaridade.hipotese,
             confianca=similaridade.confianca,
             motivo=similaridade.motivo,
@@ -111,7 +129,7 @@ def executar(session: Session, requisicao: PredictRequest) -> PredictResponse:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(erro)
         ) from erro
 
-    return montar_resposta(resultado)
+    return montar_resposta(resultado, rotulo_bruto=requisicao.fault)
 
 
 @router.post(

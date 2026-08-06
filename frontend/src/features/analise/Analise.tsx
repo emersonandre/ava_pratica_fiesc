@@ -9,6 +9,7 @@ import { Erro } from '../../components/Estado'
 import { Girando, Progresso } from '../../components/Progresso'
 import { corDaFamilia, porcento, rotuloFamilia } from '../../lib/formato'
 import { Chat } from './Chat'
+import { ColarJson } from './ColarJson'
 import { Detalhes } from './Detalhes'
 import { Prescricao } from './Prescricao'
 import './Analise.css'
@@ -34,6 +35,7 @@ export function Analise() {
   const [desfecho, setDesfecho] = useState<Desfecho>('prescricao')
   const [limiar, setLimiar] = useState(0.7)
   const [avancado, setAvancado] = useState(false)
+  const [colando, setColando] = useState(false)
 
   const familias = useFamilias()
   const amostra = useAmostra()
@@ -82,6 +84,9 @@ export function Analise() {
     procedimento.reset()
     diagnose.mutate({
       ...paraEvento(leitura),
+      // O rotulo bruto vai junto para o backend normalizar e devolver o gabarito.
+      // A taxonomia vive la; o frontend nao sabe que `cocked_rotor_2` e `cocked_rotor`.
+      fault: leitura.raw_fault || undefined,
       confianca_minima: limiar,
       gerar_prescricao: false,
     })
@@ -114,6 +119,18 @@ export function Analise() {
         nota="Vem do conjunto de teste: dados reais de 10 a 16 de junho que o sistema nunca usou para aprender.">
         {amostra.isError && <Erro erro={amostra.error} aoTentarNovamente={() => buscar({ familia: familia || undefined, desfecho, confiancaMinima: limiar })} />}
         {amostra.isPending && !leitura && <Girando texto="Procurando uma leitura…" />}
+
+        {colando && (
+          <ColarJson
+            aoCancelar={() => setColando(false)}
+            aoCarregar={(nova) => {
+              diagnose.reset()
+              procedimento.reset()
+              setLeitura(nova)
+              setColando(false)
+            }}
+          />
+        )}
 
         {leitura && (
           <div className="cartao leitura">
@@ -180,10 +197,16 @@ export function Analise() {
                 <Medida rotulo="Vibração X" valor={leitura.x_rms_velocity_mm_s} unidade="mm/s" />
               </dl>
 
-              <button type="button" className="botao-texto avancado-alternar"
-                onClick={() => setAvancado(!avancado)} aria-expanded={avancado}>
-                {avancado ? 'Ocultar opções' : 'Opções de demonstração'}
-              </button>
+              <div className="leitura-acoes">
+                <button type="button" className="botao-texto"
+                  onClick={() => setColando(!colando)} aria-expanded={colando}>
+                  {colando ? 'Fechar' : 'Colar JSON'}
+                </button>
+                <button type="button" className="botao-texto"
+                  onClick={() => setAvancado(!avancado)} aria-expanded={avancado}>
+                  {avancado ? 'Ocultar opções' : 'Opções de demonstração'}
+                </button>
+              </div>
             </div>
 
             {avancado && (
@@ -230,7 +253,7 @@ export function Analise() {
         {diagnose.isError && <Erro erro={diagnose.error} aoTentarNovamente={identificar} />}
 
         {diagnostico && leitura && (
-          <Diagnostico resultado={diagnostico} verdade={leitura.fault_family} />
+          <Diagnostico resultado={diagnostico} />
         )}
       </Passo>
 
@@ -310,9 +333,10 @@ function Passo({
   )
 }
 
-function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verdade: string }) {
+function Diagnostico({ resultado }: { resultado: RespostaAnalise }) {
   const { diagnostico, cobertura } = resultado
-  const acertou = diagnostico.familia === verdade
+  // O veredito vem do backend, que normalizou o rotulo bruto pela taxonomia.
+  const acertou = diagnostico.acertou
 
   return (
     <div className="cartao diagnostico">

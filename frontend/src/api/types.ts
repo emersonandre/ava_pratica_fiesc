@@ -120,6 +120,10 @@ export interface RespostaAnalise {
     familia: string | null
     /** Familia mais votada quando ha abstencao. Nao libera prescricao. */
     hipotese: string | null
+    /** Familia canonica do ault informado, quando houver. Gabarito. */
+    rotulo_real: string | null
+    /** Comparacao com o gabarito. null quando nao ha gabarito. */
+    acertou: boolean | null
     confianca: number
     motivo: MotivoDiagnostico
     e_problema: boolean

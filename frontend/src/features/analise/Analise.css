@@ -136,3 +136,5 @@
 .sem-procedimento-nota { font-size: 0.8125rem; max-width: 70ch; }
 
 .carregando-simples { padding: var(--e5); }
+
+.leitura-acoes { display: flex; gap: var(--e4); margin-top: var(--e3); }

@@ -30,6 +30,14 @@ class CoberturaOut(BaseModel):
 
 class DiagnosticoOut(BaseModel):
     familia: str | None = Field(description="None quando o sistema se abstem")
+    rotulo_real: str | None = Field(
+        default=None,
+        description="Familia canonica do `fault` informado, quando houver. Gabarito.",
+    )
+    acertou: bool | None = Field(
+        default=None,
+        description="Comparacao entre o diagnostico e o gabarito. None sem gabarito.",
+    )
     hipotese: str | None = Field(
         default=None,
         description="Familia mais votada quando ha abstencao. Nao libera prescricao.",
@@ -51,6 +59,16 @@ class TemposOut(BaseModel):
 
 
 class PredictRequest(SensorEventIn):
+    fault: str | None = Field(
+        default=None,
+        description=(
+            "Condicao anotada pelo operador, quando conhecida. Nao influencia o "
+            "diagnostico -- serve de gabarito: a resposta devolve a familia canonica "
+            "correspondente em `rotulo_real`, para comparar com o que o sistema "
+            "concluiu. A normalizacao acontece aqui porque a taxonomia vive no "
+            "backend; o cliente nao tem como saber que `cocked_rotor_2` e `cocked_rotor`."
+        ),
+    )
     pergunta: str | None = Field(
         default=None,
         description="Pergunta do operador. Omitir usa 'Como corrigir esta falha?'.",
