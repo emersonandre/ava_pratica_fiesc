@@ -60,19 +60,39 @@ export function useLinhaDoTempo(familia?: string) {
   })
 }
 
-/** Puxa um evento real do holdout -- dado que o modelo nunca viu. */
+export type Desfecho = 'qualquer' | 'prescricao' | 'sem_documento' | 'sem_diagnostico'
+
+export interface PedidoAmostra {
+  familia?: string
+  desfecho?: Desfecho
+  confiancaMinima?: number
+}
+
+/** Puxa um evento real do holdout -- dado que o modelo nunca viu.
+ *
+ * `desfecho` procura um evento que produza determinado resultado. O evento
+ * continua real e nunca visto; muda apenas qual dos casos reais e mostrado.
+ */
 export function useAmostra() {
   return useMutation({
-    mutationFn: (familia?: string) => {
-      const busca = familia ? `?familia=${encodeURIComponent(familia)}` : ''
-      return obter<AmostraHoldout>(`/api/internal/events/sample${busca}`)
+    mutationFn: ({ familia, desfecho, confiancaMinima }: PedidoAmostra) => {
+      const busca = new URLSearchParams()
+      if (familia) busca.set('familia', familia)
+      if (desfecho && desfecho !== 'qualquer') busca.set('desfecho', desfecho)
+      if (confiancaMinima !== undefined) {
+        busca.set('confianca_minima', String(confiancaMinima))
+      }
+      const consulta = busca.toString()
+      return obter<AmostraHoldout>(
+        `/api/internal/events/sample${consulta ? `?${consulta}` : ''}`,
+      )
     },
   })
 }
 
 export function useAnalisar() {
   return useMutation({
-    mutationFn: (evento: EventoSensor) =>
+    mutationFn: (evento: EventoSensor & { confianca_minima?: number }) =>
       enviar<RespostaAnalise>('/api/internal/events/analyze', evento),
   })
 }

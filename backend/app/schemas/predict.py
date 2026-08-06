@@ -52,6 +52,17 @@ class PredictRequest(SensorEventIn):
         description="Pergunta do operador. Omitir usa 'Como corrigir esta falha?'.",
     )
     k: int | None = Field(default=None, ge=1, le=200)
+    confianca_minima: float | None = Field(
+        default=None,
+        ge=0,
+        le=1,
+        description=(
+            "Concordancia minima da vizinhanca para o sistema emitir diagnostico. "
+            "Omitir usa o valor de SIMILARITY_CONFIDENCE_MIN. Expor este parametro "
+            "torna a troca entre cobertura e precisao inspecionavel: baixar o limiar "
+            "aumenta a fracao de eventos diagnosticados e reduz o acerto."
+        ),
+    )
 
 
 class PredictResponse(BaseModel):

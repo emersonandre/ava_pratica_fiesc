@@ -136,3 +136,20 @@ def amostra_holdout(session: Session, *, familia: str | None = None) -> SensorEv
     if familia:
         consulta = consulta.where(SensorEvent.fault_family == familia)
     return session.scalars(consulta.order_by(text("random()")).limit(1)).one_or_none()
+
+
+def candidatos_holdout(
+    session: Session, *, familia: str | None = None, limite: int = 250
+) -> list[SensorEvent]:
+    """Varios eventos do holdout, para procurar um que produza certo desfecho.
+
+    Sobre o holdout o sistema se abstem em cerca de dois tercos dos casos -- e o
+    resultado honesto, dado o deslocamento de distribuicao. Numa demonstracao,
+    porem, sortear as cegas esconde metade do comportamento: quem assiste ve
+    varias recusas seguidas e nao consegue distinguir "funcionando como
+    projetado" de "quebrado".
+    """
+    consulta = select(SensorEvent).where(SensorEvent.split == "holdout")
+    if familia:
+        consulta = consulta.where(SensorEvent.fault_family == familia)
+    return list(session.scalars(consulta.order_by(text("random()")).limit(limite)).all())

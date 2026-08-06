@@ -7,7 +7,7 @@ granular, para a interface montar seus paineis.
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
@@ -15,11 +15,13 @@ from sqlalchemy.orm import Session
 from app.controllers.v1 import predict as predict_controller
 from app.core.features import load_scaler, to_vector
 from app.database import get_session
+from app.models import SensorEvent
+from app.repositories import sensor_event as repo
 from app.schemas.predict import PredictRequest, PredictResponse
 from app.schemas.sensor_event import SensorEventIn, SensorEventOut
 from app.schemas.similarity import SimilarityResult
 from app.security import require_internal_key
-from app.services import similarity
+from app.services import coverage, similarity
 from app.settings import get_settings
 
 router = APIRouter(
@@ -53,6 +55,48 @@ def eventos_similares(
     return similarity.analisar(session, vetor.tolist(), k=k)
 
 
+def _procurar_por_desfecho(
+    session: Session,
+    *,
+    familia: str | None,
+    desfecho: str,
+    confianca_minima: float | None,
+) -> SensorEvent | None:
+    """Percorre candidatos do holdout ate achar um com o desfecho pedido.
+
+    Para `sem_documento` a busca cega raramente encontra: o desfecho exige um
+    diagnostico confiante de uma familia que nao tem procedimento, e isso e raro
+    no sorteio geral. Quando nenhuma familia foi pedida, a busca passa a
+    percorrer justamente as familias descobertas.
+    """
+    familias = [familia] if familia else [None]
+
+    if desfecho == "sem_documento" and not familia:
+        descobertas = coverage.familias_descobertas(session)
+        familias = list(descobertas) or [None]
+
+    for alvo in familias:
+        for evento in repo.candidatos_holdout(session, familia=alvo):
+            resultado = similarity.analisar(
+                session,
+                [float(v) for v in evento.features],
+                confianca_minima=confianca_minima,
+            )
+            cobertura = coverage.verificar(
+                session, resultado.familia_diagnosticada, e_problema=resultado.e_problema
+            )
+            if cobertura.motivo == _MOTIVO_ESPERADO[desfecho]:
+                return evento
+    return None
+
+
+_MOTIVO_ESPERADO = {
+    "prescricao": "coberto",
+    "sem_documento": "sem_documento",
+    "sem_diagnostico": "sem_diagnostico",
+}
+
+
 @router.post("/events/analyze", response_model=PredictResponse)
 def analisar(
     requisicao: PredictRequest,
@@ -70,18 +114,51 @@ def analisar(
 def amostra(
     session: Annotated[Session, Depends(get_session)],
     familia: Annotated[str | None, Query(description="Filtra por familia canonica")] = None,
+    desfecho: Annotated[
+        Literal["qualquer", "prescricao", "sem_documento", "sem_diagnostico"],
+        Query(description="Procura um evento que produza este desfecho"),
+    ] = "qualquer",
+    confianca_minima: Annotated[float | None, Query(ge=0, le=1)] = None,
 ) -> SensorEventOut:
     """Um evento real do holdout, para demonstracao com dado nunca visto.
 
     A amostra vem sempre do holdout (10 a 16/jun). Demonstrar sobre dado de
     treino inflaria o resultado -- o vizinho mais proximo seria o proprio evento.
+
+    O parametro `desfecho` procura um evento que produza determinado resultado.
+    Sobre o holdout o sistema se abstem em cerca de dois tercos dos casos; sem
+    esse filtro, quem esta assistindo ve varias recusas seguidas e nao consegue
+    distinguir "funcionando como projetado" de "quebrado". O evento continua
+    sendo real e nunca visto -- muda apenas qual dos casos reais e mostrado.
     """
-    evento = similarity.repo.amostra_holdout(session, familia=familia)
-    if evento is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nenhum evento de holdout para a familia {familia!r}.",
+    if desfecho == "qualquer":
+        evento = similarity.repo.amostra_holdout(session, familia=familia)
+    else:
+        evento = _procurar_por_desfecho(
+            session, familia=familia, desfecho=desfecho, confianca_minima=confianca_minima
         )
+
+    if evento is None:
+        if desfecho == "qualquer":
+            detalhe = f"Nenhum evento de holdout para a familia {familia!r}."
+        else:
+            limiar = confianca_minima if confianca_minima is not None else "configurado"
+            detalhe = (
+                f"Nenhuma leitura do conjunto de teste produz o desfecho "
+                f"{desfecho!r} com concordancia minima de {limiar}"
+                f"{f', na familia {familia!r}' if familia else ''}. "
+            )
+            if desfecho == "sem_documento":
+                detalhe += (
+                    "Este desfecho exige diagnosticar com confianca uma familia que "
+                    "nao tem procedimento cadastrado -- e as familias descobertas "
+                    "(rotor excentrico, ventoinha, falta de fase) raramente sao "
+                    "reconhecidas como elas mesmas: os vizinhos se dividem. "
+                    "Baixe a concordancia minima para cerca de 50% para encontrar."
+                )
+            else:
+                detalhe += "Ajuste a concordancia minima e tente de novo."
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detalhe)
 
     return SensorEventOut(
         id=evento.id,

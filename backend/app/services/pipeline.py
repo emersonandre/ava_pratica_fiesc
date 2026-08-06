@@ -87,6 +87,7 @@ def analisar_evento(
     *,
     pergunta: str = PERGUNTA_PADRAO,
     k: int | None = None,
+    confianca_minima: float | None = None,
 ) -> ResultadoAnalise:
     """Fluxo completo, do JSON de sensor a prescricao ou recusa."""
     settings = get_settings()
@@ -96,7 +97,9 @@ def analisar_evento(
     cronometro = _Cronometro()
     scaler = load_scaler(settings.artifacts_path)
     vetor = to_vector(scaler, payload)
-    resultado = similarity.analisar(session, vetor.tolist(), k=k)
+    resultado = similarity.analisar(
+        session, vetor.tolist(), k=k, confianca_minima=confianca_minima
+    )
     tempos.similaridade_ms = cronometro.parar()
 
     # --- 2. gate de cobertura (ANTES do LLM) -----------------------------

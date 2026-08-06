@@ -94,7 +94,11 @@ def executar(session: Session, requisicao: PredictRequest) -> PredictResponse:
 
     try:
         resultado = pipeline.analisar_evento(
-            session, requisicao.to_feature_dict(), pergunta=pergunta, k=requisicao.k
+            session,
+            requisicao.to_feature_dict(),
+            pergunta=pergunta,
+            k=requisicao.k,
+            confianca_minima=requisicao.confianca_minima
         )
     except MissingFeatureError as erro:
         raise HTTPException(

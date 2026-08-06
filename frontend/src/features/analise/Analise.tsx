@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import type { Desfecho, PedidoAmostra } from '../../api/queries'
 import { useAmostra, useAnalisar, useFamilias } from '../../api/queries'
 import type { AmostraHoldout, EventoSensor, RespostaAnalise } from '../../api/types'
 import { COLUNAS_SENSOR } from '../../api/types'
@@ -8,6 +9,7 @@ import { BarraDeVotos } from '../../components/BarraDeVotos'
 import { Erro } from '../../components/Estado'
 import { Selo } from '../../components/Selo'
 import { duracao, porcento, rotuloFamilia } from '../../lib/formato'
+import { Controles } from './Controles'
 import { Evidencia } from './Evidencia'
 import { Prescricao } from './Prescricao'
 import { Vizinhos } from './Vizinhos'
@@ -25,25 +27,41 @@ export function Analise() {
 
   const [amostraAtual, setAmostraAtual] = useState<AmostraHoldout | null>(null)
   const [pergunta, setPergunta] = useState('Como corrigir esta falha?')
+  const [familia, setFamilia] = useState(familiaAlvo ?? '')
+  const [desfecho, setDesfecho] = useState<Desfecho>('prescricao')
+  const [limiar, setLimiar] = useState(0.7)
 
   const familias = useFamilias()
   const amostra = useAmostra()
   const analise = useAnalisar()
 
-  // Carrega uma amostra ao abrir, ja filtrada pela familia vinda do painel.
+  // Carrega uma leitura ao abrir, ja filtrada pela familia vinda do painel.
   useEffect(() => {
-    amostra.mutate(familiaAlvo, { onSuccess: setAmostraAtual })
+    setFamilia(familiaAlvo ?? '')
+    sortear({ familia: familiaAlvo, desfecho: 'prescricao', confiancaMinima: 0.7 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [familiaAlvo])
 
-  function sortear(familia?: string) {
+  function sortear(pedido: PedidoAmostra) {
     analise.reset()
-    amostra.mutate(familia, { onSuccess: setAmostraAtual })
+    amostra.mutate(pedido, { onSuccess: setAmostraAtual })
+  }
+
+  function buscar() {
+    sortear({
+      familia: familia || undefined,
+      desfecho,
+      confiancaMinima: limiar,
+    })
   }
 
   function analisar() {
     if (!amostraAtual) return
-    analise.mutate({ ...paraEvento(amostraAtual), pergunta })
+    analise.mutate({
+      ...paraEvento(amostraAtual),
+      pergunta,
+      confianca_minima: limiar,
+    })
   }
 
   const resposta = analise.data
@@ -62,30 +80,25 @@ export function Analise() {
       <section className="painel entrada">
         <div className="painel-cabecalho">
           <h2>Leitura do sensor</h2>
-          {familias.data && (
-            <select
-              className="seletor"
-              value={familiaAlvo ?? ''}
-              onChange={(e) => sortear(e.target.value || undefined)}
-              aria-label="Filtrar por família"
-            >
-              <option value="">Qualquer família</option>
-              {familias.data
-                .filter((f) => f.e_problema)
-                .map((f) => (
-                  <option key={f.familia} value={f.familia}>
-                    {rotuloFamilia(f.familia)}
-                    {f.coberta ? '' : ' — sem documento'}
-                  </option>
-                ))}
-            </select>
+          {amostraAtual && (
+            <span className="fraco dado">
+              #{amostraAtual.id} · {amostraAtual.raw_fault}
+            </span>
           )}
         </div>
 
         <div className="painel-corpo entrada-corpo">
-          {amostra.isError && (
-            <Erro erro={amostra.error} aoTentarNovamente={() => sortear(familiaAlvo)} />
-          )}
+          <Controles
+            familias={familias.data ?? []}
+            familia={familia}
+            aoMudarFamilia={setFamilia}
+            desfecho={desfecho}
+            aoMudarDesfecho={setDesfecho}
+            limiar={limiar}
+            aoMudarLimiar={setLimiar}
+          />
+
+          {amostra.isError && <Erro erro={amostra.error} aoTentarNovamente={buscar} />}
 
           {amostraAtual && (
             <>
@@ -129,10 +142,10 @@ export function Analise() {
                 <button
                   type="button"
                   className="botao"
-                  onClick={() => sortear(familiaAlvo)}
+                  onClick={buscar}
                   disabled={amostra.isPending}
                 >
-                  Outra leitura
+                  {amostra.isPending ? 'Procurando…' : 'Outra leitura'}
                 </button>
 
                 <button
