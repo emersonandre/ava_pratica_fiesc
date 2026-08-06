@@ -16,6 +16,7 @@ backend/artifacts/
 # Node
 node_modules/
 frontend/dist/
+frontend/.vite/
 
 # banner.xlsx e a mesma base do banner.csv, em formato menos adequado a ETL.
 # 20 MB de duplicata nao entram no repositorio; o CSV fica versionado para
