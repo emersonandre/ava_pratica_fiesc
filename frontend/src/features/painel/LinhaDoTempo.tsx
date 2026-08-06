@@ -54,16 +54,16 @@ export function LinhaDoTempo({ pontos }: { pontos: PontoLinhaDoTempo[] }) {
     <>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={linhas} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
-          <CartesianGrid stroke="var(--linha)" vertical={false} />
+          <CartesianGrid stroke="#23304d" vertical={false} />
           <XAxis
             dataKey="dia"
             tickFormatter={dataCurta}
-            stroke="var(--texto-fraco)"
+            stroke="#6f7f9f"
             tick={{ fontSize: 11, fontFamily: 'var(--fonte-dado)' }}
             tickLine={false}
           />
           <YAxis
-            stroke="var(--texto-fraco)"
+            stroke="#6f7f9f"
             tick={{ fontSize: 11, fontFamily: 'var(--fonte-dado)' }}
             tickLine={false}
             axisLine={false}
@@ -71,28 +71,36 @@ export function LinhaDoTempo({ pontos }: { pontos: PontoLinhaDoTempo[] }) {
               value: 'leituras',
               angle: -90,
               position: 'insideLeft',
-              style: { fill: 'var(--texto-fraco)', fontSize: 11 },
+              style: { fill: '#6f7f9f', fontSize: 11 },
             }}
           />
+          {/* O Recharts escreve os estilos do tooltip inline, num contexto que
+              nao herda as variaveis CSS da aplicacao. Por isso os valores aqui
+              sao literais: usar `var(--…)` deixava o texto invisivel e o
+              destaque da coluna preto. */}
           <Tooltip
-            cursor={{ fill: 'color-mix(in srgb, var(--instrumento) 10%, transparent)' }}
+            cursor={{ fill: 'rgba(77, 159, 255, 0.10)' }}
             contentStyle={{
-              background: 'var(--painel-alto)',
-              border: '1px solid var(--linha-forte)',
-              borderRadius: 3,
+              background: '#17223a',
+              border: '1px solid #2f3f63',
+              borderRadius: 10,
+              boxShadow: '0 8px 24px -12px rgba(0,0,0,.6)',
               fontSize: 13,
+              padding: '8px 12px',
             }}
+            labelStyle={{ color: '#eaf0fa', fontWeight: 600, marginBottom: 6 }}
+            itemStyle={{ color: '#a3b1cc', padding: '2px 0' }}
             labelFormatter={(dia) => (typeof dia === 'string' ? dataCurta(dia) : String(dia ?? ''))}
-            formatter={(valor, nome) => [numero(Number(valor ?? 0)), rotuloFamilia(String(nome ?? ""))]}
+            formatter={(valor, nome) => [numero(Number(valor ?? 0)), rotuloFamilia(String(nome ?? ''))]}
           />
           <ReferenceLine
             x={INICIO_HOLDOUT}
-            stroke="var(--texto)"
+            stroke="#a3b1cc"
             strokeDasharray="4 4"
             label={{
               value: 'conjunto de teste →',
               position: 'insideTopRight',
-              fill: 'var(--texto-medio)',
+              fill: '#a3b1cc',
               fontSize: 11,
             }}
           />

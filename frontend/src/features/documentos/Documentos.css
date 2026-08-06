@@ -1,20 +1,20 @@
-.lacunas { border-left: 3px solid var(--zona-c); margin-bottom: var(--e5); }
+.lacunas { border-left: 3px solid var(--atencao); margin-bottom: var(--e5); }
 .lacunas-lista { list-style: none; margin: var(--e3) 0 0; padding: 0;
   display: flex; flex-direction: column; gap: var(--e3); }
 .lacunas-lista li {
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--e4); padding: var(--e3) var(--e4); flex-wrap: wrap;
-  background: var(--fundo); border: 1px solid var(--linha); border-radius: var(--raio);
+  background: var(--fundo); border: 1px solid var(--borda); border-radius: var(--raio);
 }
-.lacunas-nome { font-family: var(--fonte-titulo); font-weight: 600; font-size: 1rem; }
+.lacunas-nome { font-family: var(--fonte); font-weight: 600; font-size: 1rem; }
 .lacunas-lista .fraco { font-size: 0.8125rem; }
 
 .formulario { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--e5); }
 .campo-dica { font-size: 0.75rem; line-height: 1.4; }
 .formulario-acoes {
   grid-column: 1 / -1; display: flex; align-items: center; gap: var(--e4); flex-wrap: wrap;
-  padding-top: var(--e4); border-top: 1px solid var(--linha);
+  padding-top: var(--e4); border-top: 1px solid var(--borda);
 }
 .formulario-acoes span { font-size: 0.8125rem; max-width: 46ch; }
-.formulario-erro { color: var(--zona-d); }
-.formulario-ok { color: var(--zona-a); white-space: pre-line; }
+.formulario-erro { color: var(--perigo); }
+.formulario-ok { color: var(--ok); white-space: pre-line; }

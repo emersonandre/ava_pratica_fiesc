@@ -28,5 +28,5 @@ export function rotuloFamilia(familia: string): string {
 }
 
 export function corDaFamilia(familia: string): string {
-  return `var(--f-${familia}, var(--texto-fraco))`
+  return `var(--f-${familia}, var(--texto-3))`
 }
