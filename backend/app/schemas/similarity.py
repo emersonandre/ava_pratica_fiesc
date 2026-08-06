@@ -62,6 +62,14 @@ class Evidencia(BaseModel):
 
 class SimilarityResult(BaseModel):
     familia_diagnosticada: str | None = Field(description="None quando o sistema se abstem")
+    hipotese: str | None = Field(
+        default=None,
+        description=(
+            "Familia mais votada quando o sistema se abstem. Nao e diagnostico e nao "
+            "libera prescricao -- e a informacao que o sistema tem, exposta em vez de "
+            "escondida. Sem ela, uma abstencao parece ausencia de resultado."
+        ),
+    )
     confianca: float = Field(description="Concentracao do voto ponderado, em [0, 1]")
     motivo: MotivoAbstencao
     e_problema: bool = Field(

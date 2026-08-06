@@ -30,6 +30,10 @@ class CoberturaOut(BaseModel):
 
 class DiagnosticoOut(BaseModel):
     familia: str | None = Field(description="None quando o sistema se abstem")
+    hipotese: str | None = Field(
+        default=None,
+        description="Familia mais votada quando ha abstencao. Nao libera prescricao.",
+    )
     confianca: float
     motivo: str
     e_problema: bool

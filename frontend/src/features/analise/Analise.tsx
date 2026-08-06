@@ -323,7 +323,7 @@ function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verda
             diagnostico.familia ? { color: corDaFamilia(diagnostico.familia) } : undefined
           }
         >
-          {diagnostico.familia ? rotuloFamilia(diagnostico.familia) : 'Sinal ambíguo'}
+          {diagnostico.familia ? rotuloFamilia(diagnostico.familia) : 'Sem conclusão'}
         </h3>
         <span
           className={`distintivo distintivo--${diagnostico.familia && acertou ? 'ok' : 'atencao'}`}
@@ -347,9 +347,14 @@ function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verda
           </>
         ) : (
           <>
-            Nenhuma falha reúne mais de <b>{porcento(diagnostico.confianca)}</b> das{' '}
-            <b>{resultado.vizinhos.length}</b> leituras mais parecidas. O sinal não é
-            conclusivo, e o sistema prefere não opinar.
+            A hipótese mais forte é{' '}
+            <b style={{ color: corDaFamilia(diagnostico.hipotese ?? '') }}>
+              {diagnostico.hipotese ? rotuloFamilia(diagnostico.hipotese) : '—'}
+            </b>
+            , com <b>{porcento(diagnostico.confianca)}</b> das{' '}
+            <b>{resultado.vizinhos.length}</b> leituras mais parecidas — abaixo do
+            mínimo exigido. O sistema não conclui nem recomenda correção; confirme em
+            campo antes de intervir.
           </>
         )}
       </p>

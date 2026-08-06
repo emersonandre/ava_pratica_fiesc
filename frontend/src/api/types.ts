@@ -118,6 +118,8 @@ export interface Tempos {
 export interface RespostaAnalise {
   diagnostico: {
     familia: string | null
+    /** Familia mais votada quando ha abstencao. Nao libera prescricao. */
+    hipotese: string | null
     confianca: number
     motivo: MotivoDiagnostico
     e_problema: boolean

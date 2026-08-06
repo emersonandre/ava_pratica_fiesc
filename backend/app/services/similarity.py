@@ -166,6 +166,10 @@ def analisar(
         segunda = votos[1].fault_family if len(votos) > 1 else "-"
         return SimilarityResult(
             familia_diagnosticada=None,
+            # A familia mais votada continua sendo informacao util: o tecnico pode
+            # confirmar a hipotese em campo. Esconde-la faria a abstencao parecer
+            # ausencia de resultado.
+            hipotese=vencedora,
             confianca=round(confianca, 4),
             motivo="vizinhanca_dividida",
             e_problema=False,

@@ -42,6 +42,7 @@ def montar_resposta(resultado: ResultadoAnalise) -> PredictResponse:
     return PredictResponse(
         diagnostico=DiagnosticoOut(
             familia=similaridade.familia_diagnosticada,
+            hipotese=similaridade.hipotese,
             confianca=similaridade.confianca,
             motivo=similaridade.motivo,
             e_problema=similaridade.e_problema,
