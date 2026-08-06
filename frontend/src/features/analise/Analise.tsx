@@ -375,11 +375,16 @@ function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verda
         </div>
         <div className="votacao-legenda">
           {diagnostico.votos.slice(0, 3).map((voto) => (
-            <span key={voto.fault_family}>
+            <span key={voto.fault_family} className="votacao-item">
               <i style={{ background: corDaFamilia(voto.fault_family) }} />
-              {rotuloFamilia(voto.fault_family)} {porcento(voto.peso)}
+              {rotuloFamilia(voto.fault_family)} <b>{porcento(voto.peso)}</b>
             </span>
           ))}
+          {diagnostico.votos.length > 3 && (
+            <span className="votacao-item t3">
+              +{diagnostico.votos.length - 3} outras
+            </span>
+          )}
         </div>
       </div>
     </div>
