@@ -43,5 +43,13 @@ class FamiliaOut(BaseModel):
     descricao: str
     e_problema: bool
     eventos: int
+    eventos_holdout: int = Field(
+        default=0,
+        description=(
+            "Leituras disponiveis no conjunto de teste. Familias com zero nao podem "
+            "ser demonstradas: existem no historico, mas nao no periodo reservado "
+            "para avaliacao."
+        ),
+    )
     coberta: bool
     documentos: list[str]

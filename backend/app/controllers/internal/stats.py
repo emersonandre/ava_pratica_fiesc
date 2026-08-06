@@ -57,6 +57,7 @@ def visao_geral(session: Annotated[Session, Depends(get_session)]) -> VisaoGeral
     """
     geral = repo.visao_geral(session)
     contagens = repo.contagem_por_familia(session)
+    no_holdout = repo.contagem_holdout_por_familia(session)
     mapa = coverage.mapa_de_cobertura(session)
     documentos = repo.listar_documentos(session)
 
@@ -67,6 +68,7 @@ def visao_geral(session: Annotated[Session, Depends(get_session)]) -> VisaoGeral
                 descricao=FAMILY_DESCRIPTIONS.get(familia, ""),
                 e_problema=familia in PROBLEM_FAMILIES,
                 eventos=contagens.get(familia, 0),
+                eventos_holdout=no_holdout.get(familia, 0),
                 coberta=bool(mapa.get(familia)),
                 documentos=[d.arquivo for d in mapa.get(familia, ())],
             )
@@ -111,6 +113,7 @@ def linha_do_tempo(
 def familias(session: Annotated[Session, Depends(get_session)]) -> list[FamiliaOut]:
     """Familias canonicas com status de cobertura documental."""
     contagens = repo.contagem_por_familia(session)
+    no_holdout = repo.contagem_holdout_por_familia(session)
     mapa = coverage.mapa_de_cobertura(session)
 
     return [
@@ -119,6 +122,7 @@ def familias(session: Annotated[Session, Depends(get_session)]) -> list[FamiliaO
             descricao=FAMILY_DESCRIPTIONS.get(familia, ""),
             e_problema=familia in PROBLEM_FAMILIES,
             eventos=contagens.get(familia, 0),
+            eventos_holdout=no_holdout.get(familia, 0),
             coberta=bool(mapa.get(familia)),
             documentos=[d.arquivo for d in mapa.get(familia, ())],
         )

@@ -53,7 +53,28 @@ export function Analise() {
   function buscar(pedido: PedidoAmostra) {
     diagnose.reset()
     procedimento.reset()
-    amostra.mutate(pedido, { onSuccess: setLeitura })
+    amostra.mutate(pedido, {
+      onSuccess: setLeitura,
+      onError: () => {
+        // A combinacao pedida pode nao existir -- por exemplo, uma falha sem
+        // procedimento que ainda assim seja diagnosticada com alta certeza.
+        // Nesse caso vale mais mostrar uma leitura daquela condicao do que
+        // devolver um erro: o filtro de desfecho e conveniencia de demonstracao,
+        // a condicao e o que o usuario pediu.
+        if (pedido.desfecho && pedido.desfecho !== 'qualquer') {
+          amostra.mutate({ ...pedido, desfecho: 'qualquer' }, { onSuccess: setLeitura })
+        }
+      },
+    })
+  }
+
+  function trocarCondicao(novaFamilia: string) {
+    setFamilia(novaFamilia)
+    buscar({
+      familia: novaFamilia || undefined,
+      desfecho,
+      confiancaMinima: limiar,
+    })
   }
 
   function identificar() {
@@ -101,17 +122,47 @@ export function Analise() {
                 <span className="rotulo">Leitura</span>
                 <p className="leitura-id dado">#{leitura.id}</p>
               </div>
+
               <div className="leitura-verdade">
-                <span className="rotulo">Condição real anotada pelo operador</span>
-                <p className="leitura-familia" style={{ color: corDaFamilia(leitura.fault_family) }}>
-                  {rotuloFamilia(leitura.fault_family)}
-                </p>
+                <label className="rotulo" htmlFor="seletor-condicao">
+                  Condição real anotada pelo operador
+                </label>
+                <div className="seletor-condicao">
+                  <select
+                    id="seletor-condicao"
+                    value={familia || leitura.fault_family}
+                    onChange={(e) => trocarCondicao(e.target.value)}
+                    disabled={amostra.isPending}
+                    style={{ color: corDaFamilia(familia || leitura.fault_family) }}
+                  >
+                    <option value="">Qualquer condição</option>
+                    {(familias.data ?? [])
+                      // Familias sem leitura no conjunto de teste nao tem o que
+                      // demonstrar: existem no historico, mas nao no periodo
+                      // reservado para avaliacao. Oferece-las levaria a um erro.
+                      .filter((f) => f.eventos_holdout > 0)
+                      .map((f) => (
+                        <option key={f.familia} value={f.familia}>
+                          {rotuloFamilia(f.familia)}
+                          {f.e_problema && !f.coberta ? ' — sem procedimento' : ''}
+                          {!f.e_problema ? ' — não é falha' : ''}
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    type="button"
+                    className="botao seletor-sortear"
+                    onClick={() =>
+                      buscar({ familia: familia || undefined, desfecho, confiancaMinima: limiar })
+                    }
+                    disabled={amostra.isPending}
+                    title="Sortear outra leitura desta condição"
+                    aria-label="Sortear outra leitura"
+                  >
+                    {amostra.isPending ? '…' : '↻'}
+                  </button>
+                </div>
               </div>
-              <button type="button" className="botao"
-                onClick={() => buscar({ familia: familia || undefined, desfecho, confiancaMinima: limiar })}
-                disabled={amostra.isPending}>
-                {amostra.isPending ? 'Buscando…' : 'Trocar leitura'}
-              </button>
             </div>
 
             <dl className="medidas">
@@ -135,17 +186,6 @@ export function Analise() {
                     <option value="sem_documento">Falha sem procedimento</option>
                     <option value="sem_diagnostico">Sinal ambíguo</option>
                     <option value="qualquer">Sorteio livre</option>
-                  </select>
-                </label>
-                <label className="campo">
-                  <span className="rotulo">Falha</span>
-                  <select value={familia} onChange={(e) => setFamilia(e.target.value)}>
-                    <option value="">Todas</option>
-                    {(familias.data ?? []).filter((f) => f.e_problema).map((f) => (
-                      <option key={f.familia} value={f.familia}>
-                        {rotuloFamilia(f.familia)}{f.coberta ? '' : ' — sem procedimento'}
-                      </option>
-                    ))}
                   </select>
                 </label>
                 <label className="campo">

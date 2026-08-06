@@ -33,6 +33,21 @@ def contagem_por_familia(session: Session) -> dict[str, int]:
     return {familia: total for familia, total in linhas}
 
 
+def contagem_holdout_por_familia(session: Session) -> dict[str, int]:
+    """Leituras disponiveis no conjunto de teste, por familia.
+
+    Nem toda familia aparece la: `ventoinha`, por exemplo, tem 12.299 leituras no
+    historico e nenhuma no periodo reservado para avaliacao. A interface precisa
+    saber disso para nao oferecer uma condicao que nao tem o que demonstrar.
+    """
+    linhas = session.execute(
+        select(SensorEvent.fault_family, func.count())
+        .where(SensorEvent.split == "holdout")
+        .group_by(SensorEvent.fault_family)
+    ).all()
+    return {familia: total for familia, total in linhas}
+
+
 def visao_geral(session: Session) -> Row:
     return session.execute(
         select(

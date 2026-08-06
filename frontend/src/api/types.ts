@@ -179,6 +179,8 @@ export interface FamiliaResumo {
   descricao: string
   e_problema: boolean
   eventos: number
+  /** Leituras no conjunto de teste. Zero significa que não há o que demonstrar. */
+  eventos_holdout: number
   coberta: boolean
   documentos: string[]
 }
