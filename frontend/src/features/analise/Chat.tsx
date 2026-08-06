@@ -28,10 +28,17 @@ export function Chat({
   ])
 
   const chat = useChat()
-  const fim = useRef<HTMLDivElement>(null)
+  const conversa = useRef<HTMLDivElement>(null)
 
+  // Rola apenas o container da conversa, ajustando `scrollTop`.
+  //
+  // `scrollIntoView` parece a escolha obvia, mas ele rola TODOS os ancestrais
+  // rolaveis ate a janela -- o resultado era a pagina inteira subir a cada
+  // resposta, empurrando o cabecalho do chat para fora da tela.
   useEffect(() => {
-    fim.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    const caixa = conversa.current
+    if (!caixa) return
+    caixa.scrollTo({ top: caixa.scrollHeight, behavior: 'smooth' })
   }, [mensagens, chat.isPending])
 
   function perguntar(texto: string) {
@@ -84,7 +91,7 @@ export function Chat({
         </div>
       </div>
 
-      <div className="chat-conversa">
+      <div className="chat-conversa" ref={conversa}>
         {mensagens.length === 0 && !chat.isPending && (
           <div className="chat-inicio">
             <p className="t2">
@@ -109,7 +116,6 @@ export function Chat({
           </div>
         )}
 
-        <div ref={fim} />
       </div>
 
       {sugestoes.length > 0 && !chat.isPending && (
