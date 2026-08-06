@@ -21,5 +21,5 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Chave interna não vaza para o navegador**
   - *Verificação:* Buscar por `INTERNAL_API_KEY` no bundle gerado e no painel de rede do navegador não encontra o valor.
 
-- [ ] **Sobe e desce sem afetar o backend**
+- [x] **Sobe e desce sem afetar o backend**
   - *Verificação:* `docker compose -f frontend/docker-compose.yml down && up -d` não reinicia os containers de banco e API.

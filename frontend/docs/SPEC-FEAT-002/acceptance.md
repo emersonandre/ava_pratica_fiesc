@@ -3,7 +3,7 @@
 **Feature:** Dashboard de indicadores  
 Marque um item apenas quando ele tiver sido **verificado na prática**, não quando o código parecer pronto.
 
-- [ ] **Indicadores conferem com o banco**
+- [x] **Indicadores conferem com o banco**
   - *Verificação:* Os valores dos cartões batem com consulta SQL direta sobre `sensor_events`.
 
 - [x] **Famílias sem documento saltam à vista**

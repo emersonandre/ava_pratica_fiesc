@@ -3,7 +3,7 @@
 **Feature:** Gráficos analíticos  
 Marque um item apenas quando ele tiver sido **verificado na prática**, não quando o código parecer pronto.
 
-- [ ] **Distribuição temporal correta**
+- [x] **Distribuição temporal correta**
   - *Verificação:* Os picos da linha do tempo coincidem com os períodos de ensaio conhecidos de cada família.
 
 - [x] **Corte de holdout visível**

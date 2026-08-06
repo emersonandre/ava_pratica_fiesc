@@ -6,7 +6,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Acerto medido no holdout, não estimado**
   - *Verificação:* A família majoritária dos vizinhos é comparada ao rótulo real de todo o split `holdout`; a taxa e a matriz de confusão por família ficam em `backend/docs/analise/similaridade.md`.
 
-- [ ] **Evento fora de distribuição não é forçado**
+- [x] **Evento fora de distribuição não é forçado**
   - *Verificação:* Um vetor sintético com valores muito acima da faixa observada retorna `out_of_distribution = True` e `diagnosed_family = None`.
 
 - [x] **Estatísticas conferem com o banco**

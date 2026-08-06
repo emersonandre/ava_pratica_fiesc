@@ -12,10 +12,10 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Embasamento exposto**
   - *Verificação:* O score de grounding aparece na resposta, junto do que foi removido por falta de suporte.
 
-- [ ] **Contexto do evento persiste**
+- [x] **Contexto do evento persiste**
   - *Verificação:* Uma pergunta de acompanhamento ("e como valido depois?") é respondida sem reenviar o evento.
 
-- [ ] **Erro do provider é comunicado**
+- [x] **Erro do provider é comunicado**
   - *Verificação:* Falha do LLM mostra mensagem acionável e mantém o histórico da conversa.
 
 - [ ] **Interação fluida na demonstração**

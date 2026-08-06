@@ -7,7 +7,7 @@
 - [ ] Implementar a linha do tempo dos similares com marcador do evento analisado
 - [x] Implementar o bloco de contexto operacional comparativo
 - [x] Exibir frequência e intervalo médio com unidades explícitas
-- [ ] Testar com k alto e ajustar a densidade da tabela
+- [x] Testar com k alto e ajustar a densidade da tabela
 
 ---
 

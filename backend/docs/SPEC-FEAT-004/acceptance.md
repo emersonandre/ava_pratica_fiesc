@@ -21,5 +21,5 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Busca filtrada retorna resultado**
   - *Verificação:* KNN partindo de um evento do holdout, filtrado por `split='train'`, retorna k vizinhos — nunca lista vazia (regressão do pós-filtro do HNSW).
 
-- [ ] **Falha de rótulo interrompe a carga**
+- [x] **Falha de rótulo interrompe a carga**
   - *Verificação:* Um rótulo fora da taxonomia aborta a ingestão com mensagem citando o `id` e o valor bruto.

@@ -15,7 +15,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Gabarito visível**
   - *Verificação:* O rótulo real do evento aparece ao lado do diagnóstico, com indicação de acerto ou erro.
 
-- [ ] **Fora de distribuição é comunicado**
+- [x] **Fora de distribuição é comunicado**
   - *Verificação:* Evento fora de distribuição exibe aviso específico, distinto de "falha sem documento".
 
 - [x] **Desempenho transparente**

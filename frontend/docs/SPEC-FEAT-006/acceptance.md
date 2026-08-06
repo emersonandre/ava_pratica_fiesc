@@ -18,5 +18,5 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Contexto operacional comparável**
   - *Verificação:* As faixas de RPM e temperatura da vizinhança aparecem lado a lado com os valores do evento.
 
-- [ ] **Tabela usável com muitos vizinhos**
+- [x] **Tabela usável com muitos vizinhos**
   - *Verificação:* Com k = 50 a tabela permanece navegável, ordenável e sem quebra de layout.
