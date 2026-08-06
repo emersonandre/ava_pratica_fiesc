@@ -45,6 +45,10 @@ class LLMIndisponivel(RuntimeError):
     """Falha de comunicacao com o provider, ja esgotadas as tentativas."""
 
 
+class OrcamentoEstourado(RuntimeError):
+    """O modelo gastou todo o max_tokens sem produzir conteudo."""
+
+
 class CapacidadeAusente(RuntimeError):
     """O modelo configurado nao suporta o recurso pedido (ex.: visao)."""
 
@@ -61,7 +65,8 @@ class RespostaLLM:
     modelo: str
     tokens_entrada: int
     tokens_saida: int
-    latencia_s: float
+    tokens_raciocinio: int = 0
+    latencia_s: float = 0.0
     bruto: dict[str, Any] = field(default_factory=dict)
 
 
@@ -130,19 +135,41 @@ class LLMProvider:
         entrada = getattr(uso, "prompt_tokens", 0) or 0
         saida = getattr(uso, "completion_tokens", 0) or 0
 
+        # Modelos de raciocinio (DeepSeek v4, o-series) gastam parte do orcamento
+        # de saida "pensando" antes de escrever. Esses tokens contam para o
+        # max_tokens mas nao aparecem no conteudo.
+        detalhes = getattr(uso, "completion_tokens_details", None)
+        raciocinio = getattr(detalhes, "reasoning_tokens", 0) or 0
+
+        escolha = resposta.choices[0]
+        texto = escolha.message.content or ""
+
         logger.info(
-            "llm modelo=%s tokens_entrada=%d tokens_saida=%d latencia=%.2fs",
+            "llm modelo=%s entrada=%d saida=%d raciocinio=%d motivo=%s latencia=%.2fs",
             self.modelo,
             entrada,
             saida,
+            raciocinio,
+            escolha.finish_reason,
             latencia,
         )
 
+        # Orcamento estourado: sem isso o sintoma e uma string vazia sem
+        # explicacao, e o erro reportado vira "resposta nao e JSON".
+        if escolha.finish_reason == "length" and not texto.strip():
+            raise OrcamentoEstourado(
+                f"O modelo {self.modelo!r} consumiu os {saida} tokens de saida "
+                f"({raciocinio} em raciocinio interno) sem produzir conteudo. "
+                "Aumente LLM_MAX_TOKENS -- modelos de raciocinio precisam de folga "
+                "alem do tamanho da resposta desejada."
+            )
+
         return RespostaLLM(
-            texto=resposta.choices[0].message.content or "",
+            texto=texto,
             modelo=self.modelo,
             tokens_entrada=entrada,
             tokens_saida=saida,
+            tokens_raciocinio=raciocinio,
             latencia_s=round(latencia, 3),
         )
 

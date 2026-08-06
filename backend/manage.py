@@ -73,6 +73,7 @@ def cmd_secrets(_: argparse.Namespace) -> int:
 
 def cmd_report(args: argparse.Namespace) -> int:
     from scripts.report_documents import run as run_documentos
+    from scripts.report_hallucination import run as run_alucinacao
     from scripts.report_similarity import run as run_similaridade
     from scripts.report_taxonomy import run as run_taxonomy
 
@@ -80,6 +81,7 @@ def cmd_report(args: argparse.Namespace) -> int:
         "taxonomia": run_taxonomy,
         "similaridade": run_similaridade,
         "documentos": run_documentos,
+        "alucinacao": run_alucinacao,
     }
     alvos = relatorios if args.nome == "all" else {args.nome: relatorios[args.nome]}
     for nome, funcao in alvos.items():
@@ -176,7 +178,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("report", help="gera relatorios de analise")
     p.add_argument(
-        "nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade", "documentos"]
+        "nome", nargs="?", default="all", choices=["all", "taxonomia", "similaridade", "documentos", "alucinacao"]
     )
     p.set_defaults(func=cmd_report)
 

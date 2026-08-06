@@ -95,8 +95,8 @@ def recuperar(
     pergunta: str,
     *,
     ids_documentos: tuple[int, ...],
-    orcamento_tokens: int = 2500,
-    limite: int = 12,
+    orcamento_tokens: int = 2000,
+    limite: int = 8,
 ) -> list[TrechoRecuperado]:
     """Busca semantica restrita aos documentos que cobrem a familia."""
     if not ids_documentos:
