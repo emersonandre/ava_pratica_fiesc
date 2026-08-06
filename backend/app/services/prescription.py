@@ -55,6 +55,8 @@ REGRAS ABSOLUTAS:
 4. Nao invente numeros, tolerancias, torques, prazos ou especificacoes que nao
    estejam escritos nos trechos.
 5. Escreva passos acionaveis, no imperativo, um por item. Nada de paragrafos.
+   AGRUPE: no maximo 4 itens em cada secao. Um tecnico segue 4 passos claros,
+   nao 12 microetapas. Junte acoes relacionadas em um passo so.
 6. Use a terminologia dos manuais (mancal, acoplamento, crest factor, folga).
 
 Responda SOMENTE com um objeto JSON valido nesta forma:

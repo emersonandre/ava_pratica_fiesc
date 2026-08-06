@@ -119,11 +119,28 @@ def test_recuperacao_sem_cobertura_levanta(session, base_populada) -> None:
 
 
 def test_pergunta_fora_de_dominio_e_detectada() -> None:
-    assert pipeline.pergunta_no_dominio("como corrigir o desalinhamento do motor")
-    assert pipeline.pergunta_no_dominio("qual a temperatura do mancal")
-    assert not pipeline.pergunta_no_dominio("qual a capital da Franca?")
-    assert not pipeline.pergunta_no_dominio("me conte uma piada")
-    assert not pipeline.pergunta_no_dominio("quem ganhou a copa de 2022")
+    """O filtro peca para o lado permissivo: falso negativo custa mais que falso
+    positivo, porque o gate e o embasamento seguram o resto."""
+    no_dominio = [
+        "como corrigir o desalinhamento do motor",
+        "qual a temperatura aceitavel do mancal",
+        "que ferramentas eu preciso?",
+        "como confirmo que resolveu?",
+        "quais os cuidados de seguranca?",
+        "com que frequencia devo acompanhar?",
+        "o que causa esse defeito?",
+    ]
+    for pergunta in no_dominio:
+        assert pipeline.pergunta_no_dominio(pergunta), pergunta
+
+    fora = [
+        "qual a capital da Franca?",
+        "me conte uma piada",
+        "quem ganhou a copa de 2022",
+        "escreva um poema sobre o mar",
+    ]
+    for pergunta in fora:
+        assert not pipeline.pergunta_no_dominio(pergunta), pergunta
 
 
 # --- Camada 3: citacao inventada ---------------------------------------------

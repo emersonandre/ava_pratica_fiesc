@@ -42,7 +42,7 @@ export function Layout() {
             MP
           </span>
           <div>
-            <p className="marca-nome">Manutenção Prescritiva</p>
+            <p className="marca-nome">Manutenção Preditiva</p>
             <p className="marca-sub">Máquina rotativa MAQ-01</p>
           </div>
         </div>

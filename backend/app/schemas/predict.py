@@ -52,6 +52,15 @@ class PredictRequest(SensorEventIn):
         description="Pergunta do operador. Omitir usa 'Como corrigir esta falha?'.",
     )
     k: int | None = Field(default=None, ge=1, le=200)
+    gerar_prescricao: bool = Field(
+        default=True,
+        description=(
+            "Quando falso, a analise para depois do gate de cobertura e nao chama "
+            "o modelo. Serve para separar as duas etapas na interface: identificar "
+            "a falha responde em milissegundos, redigir o procedimento leva dezenas "
+            "de segundos."
+        ),
+    )
     confianca_minima: float | None = Field(
         default=None,
         ge=0,

@@ -98,7 +98,8 @@ def executar(session: Session, requisicao: PredictRequest) -> PredictResponse:
             requisicao.to_feature_dict(),
             pergunta=pergunta,
             k=requisicao.k,
-            confianca_minima=requisicao.confianca_minima
+            confianca_minima=requisicao.confianca_minima,
+            gerar_prescricao=requisicao.gerar_prescricao,
         )
     except MissingFeatureError as erro:
         raise HTTPException(

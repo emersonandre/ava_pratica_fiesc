@@ -27,11 +27,41 @@ logger = logging.getLogger("prescritiva.pipeline")
 
 PERGUNTA_PADRAO = "Como corrigir esta falha?"
 
-# Perguntas fora do dominio de manutencao industrial sao recusadas antes de
-# qualquer processamento. Barato, deterministico e cobre o caso mais obvio de
-# uso indevido.
+# Filtro grosseiro de dominio, aplicado antes de qualquer processamento.
+#
+# E a primeira barreira, nao a principal: mesmo que uma pergunta fora de assunto
+# passe daqui, a recuperacao so devolve trechos dos manuais da falha e o modelo e
+# instruido a responder apenas com eles -- entao a saida vira "a documentacao nao
+# cobre isso", nao uma invencao.
+#
+# Por isso a lista peca para o lado permissivo. Uma versao anterior, curta demais,
+# recusava "que ferramentas eu preciso?" -- pergunta obviamente pertinente para
+# quem esta na frente da maquina. Falso negativo aqui custa mais que falso
+# positivo: o gate e o embasamento seguram o resto.
 TERMOS_DE_DOMINIO = frozenset(
-    ["falha", "defeito", "vibracao", "vibração", "rolamento", "mancal", "motor", "eixo", "acoplamento", "correia", "polia", "rotor", "desalinhamento", "desbalanceamento", "manutencao", "manutenção", "corrig", "corre", "inspec", "diagnost", "lubrific", "alinha", "balancea", "tensao", "tensão", "folga", "temperatura", "rpm", "rotacao", "rotação", "ruido", "ruído", "aquecimento", "desgaste", "parafuso", "torque", "equipamento", "maquina", "máquina"]
+    [
+        # componentes e conjunto
+        "falha", "defeito", "problema", "rolamento", "mancal", "motor", "eixo",
+        "acoplamento", "correia", "polia", "rotor", "ventoinha", "base", "carcaca",
+        "carcaça", "equipamento", "maquina", "máquina", "componente", "peca", "peça",
+        # sintomas e grandezas
+        "vibracao", "vibração", "temperatura", "rpm", "rotacao", "rotação", "ruido",
+        "ruído", "aquecimento", "desgaste", "folga", "trinca", "sintoma", "causa",
+        "amplitude", "frequencia", "frequência", "harmonic",
+        # condicoes
+        "desalinhamento", "desalinha", "desbalanceamento", "desbalance", "excentric",
+        "inclinado", "frouxa", "tensionada", "contamina", "sobrecarga", "fadiga",
+        # acoes de manutencao
+        "manutencao", "manutenção", "corrig", "corre", "conserta", "repara", "resolv",
+        "inspec", "diagnost", "lubrific", "graxa", "alinha", "balancea", "ajust",
+        "troca", "substitui", "limpa", "aperta", "afrouxa", "medir", "medi",
+        "verific", "confirm", "valida", "monitor", "acompanha", "previn", "evita",
+        # recursos e processo
+        "ferramenta", "instrumento", "calco", "calço", "torque", "parafuso",
+        "tensao", "tensão", "procedimento", "passo", "etapa", "norma", "tolerancia",
+        "tolerância", "prazo", "periodicidade", "seguranca", "segurança", "epi",
+        "risco", "cuidado", "documenta", "manual",
+    ]
 )
 
 
@@ -88,6 +118,7 @@ def analisar_evento(
     pergunta: str = PERGUNTA_PADRAO,
     k: int | None = None,
     confianca_minima: float | None = None,
+    gerar_prescricao: bool = True,
 ) -> ResultadoAnalise:
     """Fluxo completo, do JSON de sensor a prescricao ou recusa."""
     settings = get_settings()
@@ -127,6 +158,20 @@ def analisar_evento(
                     if cobertura.motivo == "sem_documento"
                     else None
                 ),
+            ),
+            tempos=tempos,
+        )
+
+    # Parada opcional: a interface identifica a falha primeiro e so depois pede o
+    # procedimento. Sem isso, exibir o diagnostico custaria a espera da geracao.
+    if not gerar_prescricao:
+        return ResultadoAnalise(
+            similaridade=resultado,
+            cobertura=cobertura,
+            resposta=Recusa(
+                motivo="sem_diagnostico",
+                mensagem="Diagnostico concluido. Peca o procedimento para continuar.",
+                familia=cobertura.familia,
             ),
             tempos=tempos,
         )

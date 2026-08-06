@@ -1,0 +1,45 @@
+.procedimento { padding: var(--e5); }
+.procedimento-topo {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--e4); flex-wrap: wrap;
+  padding-bottom: var(--e5); border-bottom: 1px solid var(--borda);
+}
+.procedimento-diagnostico { font-size: 1rem; line-height: 1.6; max-width: 70ch; }
+
+.secao { margin-top: var(--e5); }
+.secao-titulo {
+  font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--acento-claro); margin-bottom: var(--e4);
+}
+.passos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--e4); }
+.passo-item { display: grid; grid-template-columns: 1.5rem minmax(0,1fr); gap: var(--e3); }
+.passo-marca {
+  display: grid; place-items: center; width: 1.5rem; height: 1.5rem;
+  border-radius: 50%; background: var(--superficie-3);
+  font-size: 0.75rem; font-weight: 600; color: var(--texto-2); flex: none;
+}
+.passo-item p { line-height: 1.65; max-width: 78ch; }
+.passo-fontes { display: flex; flex-wrap: wrap; gap: var(--e2); margin-top: var(--e2); }
+.citacao {
+  font-family: var(--fonte-dado); font-size: 0.6875rem;
+  color: var(--acento-claro); cursor: help;
+  border-bottom: 1px dotted currentColor;
+}
+
+.procedimento-avisos, .procedimento-removidos {
+  margin-top: var(--e5); padding: var(--e4);
+  background: var(--superficie-2); border-radius: var(--raio-p);
+  border-left: 2px solid var(--atencao);
+}
+.procedimento-removidos { border-left-color: var(--perigo); }
+.procedimento-avisos ul, .procedimento-removidos ul {
+  margin: var(--e3) 0 0; padding-left: var(--e5);
+  display: flex; flex-direction: column; gap: var(--e2);
+  font-size: 0.875rem; color: var(--texto-2);
+}
+
+.procedimento-fontes {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--e2) var(--e3);
+  margin-top: var(--e5); padding-top: var(--e4); border-top: 1px solid var(--borda);
+}
+.procedimento-nota { flex-basis: 100%; font-size: 0.75rem; max-width: 74ch; }

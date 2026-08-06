@@ -78,3 +78,5 @@
 }
 .sem-procedimento-texto { white-space: pre-line; max-width: 70ch; line-height: 1.65; }
 .sem-procedimento-nota { font-size: 0.8125rem; max-width: 70ch; }
+
+.carregando-simples { padding: var(--e5); }
