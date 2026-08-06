@@ -73,3 +73,58 @@ def linha_do_tempo(
     return session.execute(
         consulta.group_by(dia, SensorEvent.fault_family).order_by(dia)
     ).all()
+
+
+def distribuicao_por_familia(session: Session, *, metrica: str) -> list[Row]:
+    """Quartis de uma metrica em cada familia.
+
+    Percentil e nao media: as distribuicoes sao assimetricas -- algumas leituras
+    de rolamento tem pico de aceleracao dez vezes acima da mediana, e a media
+    sozinha esconderia isso.
+
+    E o grafico que explica a acuracia do sistema. Onde as faixas de duas
+    familias se sobrepoem, nenhuma busca por vizinho consegue separa-las; a
+    limitacao esta no sensor, nao no metodo.
+    """
+    coluna = getattr(SensorEvent, metrica)
+    return session.execute(
+        select(
+            SensorEvent.fault_family,
+            func.count().label("leituras"),
+            func.percentile_cont(0.10).within_group(coluna).label("p10"),
+            func.percentile_cont(0.25).within_group(coluna).label("p25"),
+            func.percentile_cont(0.50).within_group(coluna).label("mediana"),
+            func.percentile_cont(0.75).within_group(coluna).label("p75"),
+            func.percentile_cont(0.90).within_group(coluna).label("p90"),
+        )
+        .where(SensorEvent.fault_family.is_not(None), coluna.is_not(None))
+        .group_by(SensorEvent.fault_family)
+        .order_by(func.percentile_cont(0.50).within_group(coluna).desc())
+    ).all()
+
+
+def frequencia_por_familia(session: Session) -> list[Row]:
+    """Com que frequencia cada falha aparece -- item pedido na secao 1.
+
+    A unidade de contagem e o DIA, nao a leitura. O coletor amostra a cada poucos
+    segundos durante uma sessao de ensaio, entao intervalo entre leituras mede a
+    cadencia do equipamento e nao a recorrencia do defeito -- daria "uma falha de
+    rolamento a cada 36 segundos", que e absurdo.
+
+    Dias distintos com ocorrencia e a aproximacao honesta de "quantas vezes o
+    problema apareceu" nesta base.
+    """
+    return session.execute(
+        select(
+            SensorEvent.fault_family,
+            func.count().label("leituras"),
+            func.min(SensorEvent.created_at).label("primeira"),
+            func.max(SensorEvent.created_at).label("ultima"),
+            func.count(func.distinct(func.date_trunc("day", SensorEvent.created_at))).label(
+                "dias_com_ocorrencia"
+            ),
+        )
+        .where(SensorEvent.fault_family.is_not(None))
+        .group_by(SensorEvent.fault_family)
+        .order_by(func.count().desc())
+    ).all()

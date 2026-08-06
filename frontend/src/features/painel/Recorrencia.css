@@ -1,0 +1,91 @@
+/* Recorrencia por familia.
+ *
+ * Grade em vez de tabela: sao seis campos por linha, e uma tabela real com
+ * cabecalho seria mais peso visual do que o conteudo pede.
+ */
+
+.recorrencia {
+  display: grid;
+  gap: var(--e2);
+}
+
+.recorrencia-linha {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(4rem, 1fr) 4rem 9.5rem 8.5rem 4.5rem;
+  align-items: center;
+  gap: var(--e3);
+  padding: var(--e2) 0;
+  border-bottom: 1px solid var(--borda);
+}
+.recorrencia-linha:last-child {
+  border-bottom: none;
+}
+
+.recorrencia-nome {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recorrencia-nome i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex: none;
+}
+
+.recorrencia-barra {
+  height: 0.5rem;
+  border-radius: var(--raio-pill);
+  background: var(--superficie-2);
+  overflow: hidden;
+}
+.recorrencia-barra span {
+  display: block;
+  height: 100%;
+  border-radius: var(--raio-pill);
+  opacity: 0.8;
+}
+
+.recorrencia-dias,
+.recorrencia-total {
+  font-family: var(--fonte-dado);
+  font-size: 0.8125rem;
+  text-align: right;
+}
+.recorrencia-total {
+  color: var(--texto-2);
+}
+
+.recorrencia-intervalo,
+.recorrencia-periodo {
+  white-space: nowrap;
+}
+.recorrencia-periodo {
+  font-family: var(--fonte-dado);
+  text-align: right;
+}
+
+/* Abaixo de 64rem os campos secundarios saem: o que importa e a familia, a
+ * barra e o numero de dias. Periodo e total sao contexto. */
+@media (max-width: 64rem) {
+  .recorrencia-linha {
+    grid-template-columns: 8rem minmax(3rem, 1fr) 3.5rem 9rem;
+  }
+  .recorrencia-periodo,
+  .recorrencia-total {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .recorrencia-linha {
+    grid-template-columns: 7rem minmax(3rem, 1fr) 3.5rem;
+  }
+  .recorrencia-intervalo {
+    display: none;
+  }
+}

@@ -4,6 +4,8 @@ import { useLinhaDoTempo, useVisaoGeral } from '../../api/queries'
 import { Carregando, Erro } from '../../components/Estado'
 import { corDaFamilia, dataCurta, numero, rotuloFamilia } from '../../lib/formato'
 import { LinhaDoTempo } from './LinhaDoTempo'
+import { Recorrencia } from './Recorrencia'
+import { Separabilidade } from './Separabilidade'
 import './Painel.css'
 
 export function Painel() {
@@ -103,6 +105,8 @@ export function Painel() {
         </div>
       </section>
 
+      <Recorrencia />
+
       <section className="cartao">
         <div className="cartao-topo">
           <div>
@@ -153,6 +157,8 @@ export function Painel() {
           </table>
         </div>
       </section>
+
+      <Separabilidade />
     </>
   )
 }

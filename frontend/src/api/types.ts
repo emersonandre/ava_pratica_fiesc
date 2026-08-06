@@ -259,3 +259,30 @@ export interface RespostaChat {
   sugestoes: string[]
   tempos: Tempos
 }
+export interface FaixaDaFamilia {
+  familia: string
+  leituras: number
+  p10: number
+  p25: number
+  mediana: number
+  p75: number
+  p90: number
+}
+
+export interface Distribuicao {
+  metrica: string
+  unidade: string
+  familias: FaixaDaFamilia[]
+}
+
+export interface FrequenciaDaFamilia {
+  familia: string
+  e_problema: boolean
+  leituras: number
+  primeira: string
+  ultima: string
+  dias_com_ocorrencia: number
+  leituras_por_dia: number
+  /** null quando a familia so aparece num dia -- zero leria como "o tempo todo". */
+  intervalo_medio_dias: number | null
+}

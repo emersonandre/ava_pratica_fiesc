@@ -3,8 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { enviar, enviarArquivo, obter } from './client'
 import type {
   AmostraHoldout,
+  Distribuicao,
   DocumentoIndexado,
   EventoSensor,
+  FrequenciaDaFamilia,
   FamiliaResumo,
   PontoLinhaDoTempo,
   MensagemChat,
@@ -20,6 +22,8 @@ export const chaves = {
   familias: ['familias'] as const,
   documentos: ['documentos'] as const,
   linhaDoTempo: (familia?: string) => ['linha-do-tempo', familia ?? 'todas'] as const,
+  distribuicao: (metrica: string) => ['distribuicao', metrica] as const,
+  frequencia: ['frequencia'] as const,
 }
 
 export function useSaude() {
@@ -28,6 +32,31 @@ export function useSaude() {
     queryFn: () => obter<Saude>('/api/health'),
     refetchInterval: 30_000,
     retry: false,
+  })
+}
+
+/** Faixa de valores de uma metrica em cada familia.
+ *
+ * `staleTime` alto de proposito: sao percentis sobre a base inteira, que so
+ * mudam quando chega leitura nova. Trocar de metrica no seletor nao deve
+ * refazer a consulta da metrica anterior.
+ */
+export function useDistribuicao(metrica: string) {
+  return useQuery({
+    queryKey: chaves.distribuicao(metrica),
+    queryFn: () =>
+      obter<Distribuicao>(
+        `/api/internal/stats/distribution?metrica=${encodeURIComponent(metrica)}`,
+      ),
+    staleTime: 5 * 60_000,
+  })
+}
+
+export function useFrequencia() {
+  return useQuery({
+    queryKey: chaves.frequencia,
+    queryFn: () => obter<FrequenciaDaFamilia[]>('/api/internal/stats/frequency'),
+    staleTime: 5 * 60_000,
   })
 }
 
