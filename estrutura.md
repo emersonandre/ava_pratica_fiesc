@@ -37,6 +37,8 @@ ava_pratica_fiesc/
 ├── tools/specs/            # catálogo das specs e gerador de status
 ├── desafio.md              # enunciado original
 ├── estrutura.md            # este documento
+├── ARQUITETURA.md          # arquitetura de solução e de implantação industrial
+├── commands.md             # passo a passo para subir e testar
 ├── README.md               # visão geral, decisões e execução
 └── .gitignore
 ```
@@ -210,46 +212,73 @@ tarefas administrativas em um comando só:
 
 ## 4. Frontend
 
-Estrutura planejada — specs escritas em `frontend/docs/`, código pendente.
+React 19 + TypeScript + Vite. Sem framework de UI: os componentes são poucos e específicos,
+e uma biblioteca genérica traria mais peso que proveito.
 
 ```
 frontend/
-├── docker-compose.yml           ✅ serviço web, rede externa compartilhada
-├── .env.example                 ✅
-├── Dockerfile                   🔜 multi-estágio: build Vite → nginx
-├── nginx.conf                   🔜 proxy que injeta X-Internal-Key
-├── package.json                 🔜
-├── vite.config.ts               🔜
-├── tsconfig.json                🔜
+├── docker-compose.yml           serviço web, rede externa compartilhada
+├── Dockerfile                   multi-estágio: build Vite → nginx
+├── nginx.conf.template          proxy que injeta X-Internal-Key
+├── .env.example
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
 │
 ├── src/
-│   ├── main.tsx                 🔜 bootstrap
-│   ├── App.tsx                  🔜 rotas e layout
+│   ├── main.tsx                 bootstrap, rotas e provider do TanStack Query
 │   │
-│   ├── api/                     🔜 cliente tipado + hooks de query
-│   │   ├── client.ts            #   fetch com tratamento de erro
-│   │   ├── types.ts             #   tipos derivados do contrato da API
-│   │   └── hooks/               #   TanStack Query
+│   ├── api/
+│   │   ├── client.ts            fetch com teto de espera e erro nomeado
+│   │   ├── queries.ts           hooks do TanStack Query, um por endpoint
+│   │   └── types.ts             tipos espelhando o contrato da API
 │   │
-│   ├── components/              🔜 reutilizáveis
-│   │   ├── layout/              #   barra lateral, cabeçalho, saúde do sistema
-│   │   ├── charts/              #   Recharts com paleta compartilhada
-│   │   └── feedback/            #   vazio, carregando, erro
+│   ├── components/
+│   │   ├── Layout.tsx           barra lateral, cabeçalho, saúde do sistema
+│   │   ├── Estado.tsx           carregando, erro, vazio
+│   │   └── Progresso.tsx        etapas do pipeline com peso proporcional
 │   │
-│   ├── features/                🔜 uma pasta por área funcional
-│   │   ├── dashboard/           #   KPIs, ranking, cobertura documental
-│   │   ├── analise/             #   editor de JSON, simulador do holdout
-│   │   ├── similares/           #   vizinhos, votação, timeline
-│   │   ├── chat/                #   prescrição com citações clicáveis
-│   │   └── documentos/          #   lista, upload, lacunas de cobertura
+│   ├── features/
+│   │   ├── painel/
+│   │   │   ├── Painel.tsx       a regra do sistema, KPIs, tipos de falha
+│   │   │   ├── LinhaDoTempo.tsx ocorrências por dia, com o corte do holdout
+│   │   │   ├── Recorrencia.tsx  dias com ocorrência e intervalo médio
+│   │   │   └── Separabilidade.tsx  faixa de valores por família
+│   │   ├── analise/
+│   │   │   ├── Analise.tsx      os quatro passos da análise
+│   │   │   ├── ColarJson.tsx    entrada manual de leitura em JSON
+│   │   │   ├── Prescricao.tsx   procedimento, citado passo a passo
+│   │   │   ├── Chat.tsx         perguntas ancoradas no evento
+│   │   │   ├── Citacoes.tsx     citação clicável e painel do trecho
+│   │   │   └── Detalhes.tsx     vizinhos, votação e tempos por etapa
+│   │   └── documentos/
+│   │       └── Documentos.tsx   lista, upload e lacunas de cobertura
 │   │
-│   ├── lib/                     🔜 formatação, paleta de famílias, tokens
-│   └── styles/                  🔜 tokens de design em CSS custom properties
+│   ├── lib/formato.ts           número, data, rótulo e cor de família
+│   └── styles/
+│       ├── tokens.css           paleta, tipografia, espaço, forma
+│       └── base.css             reset e primitivas (cartão, distintivo, botão)
 │
 └── docs/
-    ├── README.md                ✅ índice de specs com status
-    └── SPEC-FEAT-001..008/      ✅ spec.md + acceptance.md + tasks.md
+    ├── README.md                índice de specs com status
+    └── SPEC-FEAT-001..008/      spec.md + acceptance.md + tasks.md
 ```
+
+### Os quatro passos da análise
+
+A tela de análise é a leitura do enunciado transformada em fluxo. Cada passo só aparece
+quando o anterior conclui, e a ordem não é estética — é a do pipeline:
+
+| Passo | O que acontece | Vem de |
+| --- | --- | --- |
+| 1 | Escolher a leitura: do holdout, por condição anotada, ou colando o JSON | `GET /events/sample` |
+| 2 | Identificar a falha: votação dos 50 vizinhos e concordância | `POST /events/analyze` |
+| 3 | Procedimento recomendado, ou a recusa explicando o motivo | mesmo endpoint, `gerar_prescricao` |
+| 4 | Chat: perguntas de acompanhamento, sujeitas ao mesmo gate | `POST /chat` |
+
+O passo 3 é onde a recusa aparece. Não é caminho de erro: é o comportamento correto quando a
+família não tem documento, quando o padrão é operação normal, ou quando a vizinhança não
+concorda o bastante.
 
 ### Chave interna nunca chega ao navegador
 
@@ -289,14 +318,20 @@ Consumida por sistemas da planta (CMMS, supervisório, coletor de dados).
 | `POST` | `/api/v1/auth/token` | — |
 | `POST` | `/api/v1/predict` | `predict` |
 | `POST` | `/api/v1/upload_doc` | `upload` |
+| `POST` | `/api/v1/events` | `ingest` |
 
 Escopo por endpoint: um integrador somente-leitura não injeta documento na base que orienta
-intervenção física em equipamento.
+intervenção física em equipamento, e o coletor que envia leitura não obtém prescrição.
+
+`/api/v1/events` é a entrada automática da Figura 01: o supervisório grava a leitura no
+histórico assim que ela acontece. Leitura sem `fault`, ou com rótulo fora da taxonomia, é
+gravada mesmo assim — a medição vale mais que a anotação —, mas não participa da votação.
 
 ### Interna — `/api/internal`, cabeçalho `X-Internal-Key`
 
-Consumida apenas pelo frontend: similaridade sem LLM, chat, estatísticas do dashboard,
-cobertura documental e amostras do holdout.
+Consumida apenas pelo frontend: análise completa e similaridade isolada, chat, amostras do
+holdout, estatísticas do painel (`overview`, `timeline`, `distribution`, `frequency`),
+famílias com estado de cobertura e cadastro de documento.
 
 ### Pública
 
@@ -328,5 +363,5 @@ e um critério só é marcado após verificação prática.
 
 | App | Features | Índice |
 | --- | ---: | --- |
-| Backend | 16 | [`backend/docs/README.md`](backend/docs/README.md) |
+| Backend | 17 | [`backend/docs/README.md`](backend/docs/README.md) |
 | Frontend | 8 | [`frontend/docs/README.md`](frontend/docs/README.md) |

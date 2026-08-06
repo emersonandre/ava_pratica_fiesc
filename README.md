@@ -204,12 +204,33 @@ similaridade   cobertura      (OpenAI / DeepSeek,
 | `POST` | `/api/v1/auth/token` | — | Troca `client_id`/`client_secret` por um JWT |
 | `POST` | `/api/v1/predict` | `predict` | JSON de métricas do sensor → motor de similaridade → busca no banco vetorial → LLM → JSON consolidado |
 | `POST` | `/api/v1/upload_doc` | `upload` | Envia documento orientativo, processa e injeta no banco vetorial |
+| `POST` | `/api/v1/events` | `ingest` | Recebe leituras do coletor e grava na base de análise |
+
+`/api/v1/events` fecha o ciclo da Figura 01: o supervisório envia a leitura assim que ela
+acontece, e ela passa a fazer parte do histórico consultado nas próximas análises. Aceita uma
+leitura ou um lote, no formato exato do exemplo da seção 2 do enunciado.
+
+Leitura sem `fault`, ou com rótulo fora da taxonomia, **é gravada mesmo assim** — a medição do
+sensor vale mais que a anotação. Ela entra no histórico mas não participa da votação, e o
+rótulo desconhecido volta na resposta para alguém decidir se vira família nova.
 
 ### Interna — `/api/internal` (cabeçalho `X-Internal-Key`)
 
-Consumida apenas pelo frontend: similaridade sem LLM, chat, estatísticas do dashboard,
-cobertura documental e amostras do holdout. A chave vive no proxy do container do frontend e
-**nunca chega ao navegador**.
+Consumida apenas pelo frontend. A chave vive no proxy do container do frontend e **nunca chega
+ao navegador**.
+
+| Rota | Função |
+| --- | --- |
+| `POST /events/analyze` | Mesmo pipeline do `predict`, sem JWT |
+| `POST /events/similar` | Só a similaridade, sem passar pelo modelo |
+| `GET /events/sample` | Amostra do holdout, filtrável por família e por desfecho |
+| `POST /chat` | Conversa ancorada num evento, sujeita ao mesmo gate de cobertura |
+| `GET /stats/overview` | KPIs do painel numa chamada |
+| `GET /stats/timeline` | Ocorrências por dia e por família |
+| `GET /stats/distribution` | Faixa de valores de uma métrica em cada família |
+| `GET /stats/frequency` | Recorrência: dias com ocorrência e intervalo médio |
+| `GET /faults` | Famílias canônicas com estado de cobertura documental |
+| `GET`/`POST` `/documents` | Lista e cadastra documento orientativo |
 
 ---
 
@@ -345,11 +366,19 @@ marcados — e um critério só é marcado após verificação prática.
 
 | Marco | Conteúdo | Situação |
 | --- | --- | --- |
-| **M1** | Infra, taxonomia, features, ingestão | em andamento |
-| **M2** | OCR, indexação documental, gate de cobertura | pendente |
-| **M3** | Similaridade calibrada, RAG, geração, antialucinação | pendente |
-| **M4** | API completa, upload de documento, frontend | pendente |
-| **M5** | Documentação de arquitetura, roteiro de demonstração | pendente |
+| **M1** | Infra, taxonomia, features, ingestão | concluído |
+| **M2** | OCR, indexação documental, gate de cobertura | concluído |
+| **M3** | Similaridade calibrada, RAG, geração, antialucinação | concluído |
+| **M4** | API completa, upload de documento, frontend | concluído |
+| **M5** | Documentação de arquitetura, roteiro de demonstração | concluído |
+
+O andamento por feature não é escrito à mão: sai da contagem de checkboxes em
+[`backend/docs/README.md`](backend/docs/README.md) (17 features) e
+[`frontend/docs/README.md`](frontend/docs/README.md) (8 features).
+
+A arquitetura de implantação industrial — segmentação de rede ISA-95, dimensionamento,
+degradação, ciclo de vida do modelo e alternativas descartadas — está em
+[`ARQUITETURA.md`](ARQUITETURA.md).
 
 ---
 
