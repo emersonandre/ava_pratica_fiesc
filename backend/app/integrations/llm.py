@@ -23,12 +23,17 @@ from tenacity import (
     retry,
     retry_if_exception_type,
     stop_after_attempt,
+    stop_after_delay,
     wait_exponential,
 )
 
 from app.settings import Settings, get_settings
 
 logger = logging.getLogger("prescritiva.llm")
+
+# Lido na importacao porque o decorador de retry e avaliado quando a classe e
+# definida, e nao a cada chamada -- `self` ainda nao existe nesse ponto.
+ORCAMENTO_DE_TENTATIVAS = get_settings().llm_budget_seconds
 
 Papel = Literal["system", "user", "assistant"]
 
@@ -105,10 +110,17 @@ class LLMProvider:
 
     # -- chamadas ---------------------------------------------------------
 
+    # O limite e de TEMPO, nao so de tentativas.
+    #
+    # Quatro tentativas com timeout de 120s dariam oito minutos de espera antes
+    # de a interface ver qualquer coisa -- pior que falhar. `stop_after_delay`
+    # corta em `llm_budget_seconds` independente de quantas tentativas couberam,
+    # e quem espera recebe um erro em tempo util em vez de um cronometro que so
+    # sobe.
     @retry(
         retry=retry_if_exception_type((APIConnectionError, APITimeoutError, RateLimitError)),
         wait=wait_exponential(multiplier=2, min=2, max=30),
-        stop=stop_after_attempt(4),
+        stop=stop_after_delay(ORCAMENTO_DE_TENTATIVAS) | stop_after_attempt(4),
         reraise=True,
     )
     def _chamar(self, mensagens: list[dict[str, Any]], **opcoes: Any) -> Any:

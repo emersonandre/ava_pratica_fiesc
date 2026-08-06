@@ -39,7 +39,12 @@ class Settings(BaseSettings):
     llm_base_url: str = ""
     llm_temperature: float = 0.1
     llm_max_tokens: int = 16000
-    llm_timeout_seconds: int = 60
+    # Modelo de raciocinio: a latencia medida fica em torno de 34s, e o pico
+    # passa de 60s. Um timeout apertado nao protege ninguem -- so transforma uma
+    # resposta lenta em uma tentativa desperdicada, e a seguinte demora igual.
+    llm_timeout_seconds: int = 120
+    # Teto para o conjunto de tentativas de uma unica chamada.
+    llm_budget_seconds: int = 180
 
     # --- Visao (OCR offline) ---
     vision_provider: Literal["openai", "deepseek"] = "openai"

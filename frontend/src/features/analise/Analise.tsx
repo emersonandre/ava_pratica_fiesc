@@ -14,10 +14,17 @@ import { Detalhes } from './Detalhes'
 import { Prescricao } from './Prescricao'
 import './Analise.css'
 
+/* As etapas nao sao decorativas: sao as do pipeline, na proporcao medida.
+ *
+ * A verificacao das citacoes leva 0,7ms -- e comparacao de texto, sem modelo.
+ * Ela tinha um terco da barra so por estar na lista, e o indicador ficava
+ * parado em "Conferindo cada citacao" enquanto o que faltava, de verdade, era
+ * o modelo terminar de escrever. Quem olhava concluia que travou na conferencia.
+ *
+ * Peso proporcional ao tempo real: buscar trechos ~2s, redigir ~34s. */
 const ETAPAS_PROCEDIMENTO = [
-  'Buscando trechos nos manuais',
-  'Redigindo o procedimento',
-  'Conferindo cada citação',
+  { texto: 'Buscando trechos nos manuais', peso: 2 },
+  { texto: 'Redigindo o procedimento', peso: 34 },
 ]
 
 function paraEvento(amostra: AmostraHoldout): EventoSensor {

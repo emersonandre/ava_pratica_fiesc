@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { enviar, enviarArquivo, obter } from './client'
+import { ESPERA_GERACAO_MS, enviar, enviarArquivo, obter } from './client'
 import type {
   AmostraHoldout,
   Distribuicao,
@@ -130,7 +130,9 @@ export function useAnalisar() {
         gerar_prescricao?: boolean
       },
     ) =>
-      enviar<RespostaAnalise>('/api/internal/events/analyze', evento),
+      // Com `gerar_prescricao` a chamada passa pelo modelo e leva ~35s;
+      // sem, resolve em menos de 1s. O teto folgado vale para as duas.
+      enviar<RespostaAnalise>('/api/internal/events/analyze', evento, ESPERA_GERACAO_MS),
   })
 }
 
@@ -178,6 +180,6 @@ export interface PedidoChat {
 export function useChat() {
   return useMutation({
     mutationFn: (pedido: PedidoChat) =>
-      enviar<RespostaChat>('/api/internal/chat', pedido),
+      enviar<RespostaChat>('/api/internal/chat', pedido, ESPERA_GERACAO_MS),
   })
 }
