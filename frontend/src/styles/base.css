@@ -1,0 +1,198 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte-corpo);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  /* Numeros tabulares em toda a aplicacao: medicao que dansa ao atualizar e
+   * ilegivel em painel operacional. */
+  font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+h2 {
+  font-size: 1.125rem;
+}
+h3 {
+  font-size: 0.9375rem;
+}
+
+a {
+  color: var(--instrumento-forte);
+  text-decoration-color: color-mix(in srgb, var(--instrumento-forte) 40%, transparent);
+  text-underline-offset: 2px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--instrumento-forte);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--fundo);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--linha-forte);
+  border-radius: 5px;
+}
+
+/* --- utilitarios de texto ------------------------------------------------ */
+
+.rotulo {
+  font-family: var(--fonte-titulo);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.dado {
+  font-family: var(--fonte-dado);
+  font-variant-numeric: tabular-nums;
+}
+
+.fraco {
+  color: var(--texto-fraco);
+}
+.medio {
+  color: var(--texto-medio);
+}
+
+/* --- superficies --------------------------------------------------------- */
+
+.painel {
+  background: var(--painel);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+}
+
+.painel-cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e4);
+  padding: var(--e4) var(--e5);
+  border-bottom: 1px solid var(--linha);
+}
+
+.painel-corpo {
+  padding: var(--e5);
+}
+
+/* --- tabelas ------------------------------------------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+th {
+  text-align: left;
+  font-family: var(--fonte-titulo);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+  padding: var(--e2) var(--e3);
+  border-bottom: 1px solid var(--linha);
+  white-space: nowrap;
+}
+
+td {
+  padding: var(--e2) var(--e3);
+  border-bottom: 1px solid color-mix(in srgb, var(--linha) 55%, transparent);
+}
+
+tbody tr:hover td {
+  background: color-mix(in srgb, var(--instrumento) 6%, transparent);
+}
+
+.num {
+  text-align: right;
+  font-family: var(--fonte-dado);
+}
+
+/* --- botoes -------------------------------------------------------------- */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  padding: var(--e2) var(--e4);
+  background: var(--painel-alto);
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio);
+  font-family: var(--fonte-titulo);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 120ms, background 120ms;
+}
+
+.botao:hover:not(:disabled) {
+  border-color: var(--instrumento);
+  background: color-mix(in srgb, var(--instrumento) 12%, var(--painel-alto));
+}
+
+.botao:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.botao-primario {
+  background: color-mix(in srgb, var(--instrumento) 22%, var(--painel-alto));
+  border-color: var(--instrumento);
+  color: var(--instrumento-forte);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

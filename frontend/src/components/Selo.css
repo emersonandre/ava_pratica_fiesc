@@ -1,0 +1,76 @@
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  padding: var(--e1) var(--e3);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-family: var(--fonte-titulo);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.selo-marca {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Cada estado usa cor + forma da marca, nao so cor. */
+.selo--ok {
+  color: var(--zona-a);
+  background: color-mix(in srgb, var(--zona-a) 10%, transparent);
+}
+
+.selo--ausente {
+  color: var(--zona-c);
+  background: color-mix(in srgb, var(--zona-c) 10%, transparent);
+}
+.selo--ausente .selo-marca {
+  border-radius: 0;
+  transform: rotate(45deg);
+}
+
+.selo--indefinido {
+  color: var(--zona-b);
+  background: color-mix(in srgb, var(--zona-b) 10%, transparent);
+}
+.selo--indefinido .selo-marca {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.selo--neutro {
+  color: var(--texto-medio);
+  background: color-mix(in srgb, var(--texto-medio) 8%, transparent);
+}
+.selo--neutro .selo-marca {
+  border-radius: 1px;
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 0 var(--e2);
+  border-radius: 2px;
+  font-family: var(--fonte-dado);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  border: 1px solid currentColor;
+}
+
+.etiqueta--ok {
+  color: var(--zona-a);
+}
+.etiqueta--ausente {
+  color: var(--zona-c);
+}
+.etiqueta--atencao {
+  color: var(--zona-b);
+}
+.etiqueta--neutro {
+  color: var(--texto-fraco);
+}

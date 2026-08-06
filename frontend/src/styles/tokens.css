@@ -1,0 +1,75 @@
+/* Sistema visual.
+ *
+ * A paleta de severidade nao foi escolhida por gosto: sao as zonas de avaliacao
+ * da ISO 10816, a norma que classifica vibracao em maquinas rotativas. Zona A
+ * (boa), B (aceitavel), C (atencao) e D (inaceitavel). Usar o vocabulario que o
+ * tecnico ja conhece vale mais que uma paleta bonita e arbitraria.
+ *
+ * O fundo e grafite com fundo esverdeado -- cor de painel de instrumento e de
+ * carcaca de motor industrial, nao preto neutro. A operacao acontece em ambiente
+ * de pouca luz, entao o tema e escuro por decisao, nao por moda.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* --- superficie --- */
+  --fundo: #0e1418;
+  --painel: #151f25;
+  --painel-alto: #1b272e;
+  --linha: #24333c;
+  --linha-forte: #33454f;
+
+  /* --- texto --- */
+  --texto: #dde7ec;
+  --texto-medio: #9db0bb;
+  --texto-fraco: #6b8290;
+
+  /* --- zonas de severidade (ISO 10816) --- */
+  --zona-a: #4fb286; /* boa */
+  --zona-b: #c9b458; /* aceitavel */
+  --zona-c: #d98a48; /* atencao */
+  --zona-d: #c4553b; /* inaceitavel */
+
+  /* --- instrumento --- */
+  --instrumento: #6fa8c7;
+  --instrumento-forte: #8fc4de;
+
+  /* --- tipografia --- */
+  --fonte-titulo: 'IBM Plex Sans Condensed', 'IBM Plex Sans Variable',
+    system-ui, sans-serif;
+  --fonte-corpo: 'IBM Plex Sans Variable', system-ui, sans-serif;
+  --fonte-dado: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* --- escala de espaco: base 4, progressao consciente --- */
+  --e1: 0.25rem;
+  --e2: 0.5rem;
+  --e3: 0.75rem;
+  --e4: 1rem;
+  --e5: 1.5rem;
+  --e6: 2rem;
+  --e7: 3rem;
+
+  --raio: 3px;
+  --largura-rail: 15rem;
+}
+
+/* Cor por familia de falha. Estavel em toda a aplicacao: a mesma familia tem a
+ * mesma cor no painel, nos graficos e na lista de vizinhos. Cor inconsistente
+ * entre paineis confunde mais do que ajuda. */
+:root {
+  --f-rolamento: #6fa8c7;
+  --f-desbalanceamento: #c9b458;
+  --f-desalinhamento: #d98a48;
+  --f-cocked_rotor: #a98bc4;
+  --f-eccentric_rotor: #c4553b;
+  --f-polia: #4fb286;
+  --f-correia: #7fbfa0;
+  --f-ventoinha: #cf7fa8;
+  --f-falta_fase: #d4634f;
+  --f-normal: #4a6470;
+  --f-baseline: #4a6470;
+  --f-teste: #4a6470;
+  --f-acelerando: #4a6470;
+  --f-motor_desligado: #3b515c;
+}

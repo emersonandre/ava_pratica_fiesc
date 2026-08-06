@@ -1,0 +1,11 @@
+.tabela-vizinhos td { vertical-align: middle; }
+.vizinho-familia { display: inline-flex; align-items: center; gap: var(--e2); font-size: 0.8125rem; }
+.vizinho-igual { color: var(--zona-a); font-weight: 700; }
+.semelhanca { display: flex; align-items: center; gap: var(--e3); min-width: 11rem; }
+.semelhanca-trilha {
+  flex: 1; height: 0.375rem; background: var(--fundo);
+  border: 1px solid var(--linha); border-radius: 2px; overflow: hidden;
+}
+.semelhanca-barra { display: block; height: 100%; }
+.semelhanca b { font-size: 0.8125rem; min-width: 3.5rem; text-align: right; }
+.tabela-nota { margin-top: var(--e3); font-size: 0.75rem; max-width: 76ch; }

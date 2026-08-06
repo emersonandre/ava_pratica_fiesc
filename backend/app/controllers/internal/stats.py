@@ -5,17 +5,18 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.controllers.v1.upload_doc import upload_doc
 from app.core.taxonomy import (
     FAMILY_DESCRIPTIONS,
     PROBLEM_FAMILIES,
 )
 from app.database import get_session
 from app.repositories import document as repo
-from app.schemas.document import DocumentoOut, FamiliaOut
+from app.schemas.document import DocumentoOut, FamiliaOut, UploadDocResponse
 from app.security import require_internal_key
 from app.services import coverage
 
@@ -123,6 +124,26 @@ def familias(session: Annotated[Session, Depends(get_session)]) -> list[FamiliaO
         )
         for familia in sorted(FAMILY_DESCRIPTIONS)
     ]
+
+
+@router.post(
+    "/documents",
+    response_model=UploadDocResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def registrar_documento(
+    session: Annotated[Session, Depends(get_session)],
+    file: Annotated[UploadFile, File()],
+    fault_family: Annotated[str, Form()],
+    title: Annotated[str | None, Form()] = None,
+) -> UploadDocResponse:
+    """Upload pelo frontend.
+
+    Mesma implementacao de `/api/v1/upload_doc`, com a autenticacao da superficie
+    interna. O frontend usa chave estatica, nao JWT -- e nao teria como obter um
+    token sem embutir a credencial de cliente no bundle.
+    """
+    return await upload_doc(session=session, file=file, fault_family=fault_family, title=title)
 
 
 @router.get("/documents", response_model=list[DocumentoOut])

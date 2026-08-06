@@ -2,12 +2,12 @@
 
 **Feature:** Gestão de documentos
 
-- [ ] Implementar a listagem de documentos com estado de indexação
-- [ ] Implementar a sinalização visual de extração por OCR
-- [ ] Implementar o formulário de upload com seleção de família e barra de progresso
-- [ ] Implementar o painel de lacunas de cobertura com ação de upload
-- [ ] Invalidar as queries de documentos e de cobertura após upload
-- [ ] Tratar e testar os casos de erro de upload
+- [x] Implementar a listagem de documentos com estado de indexação
+- [x] Implementar a sinalização visual de extração por OCR
+- [x] Implementar o formulário de upload com seleção de família e barra de progresso
+- [x] Implementar o painel de lacunas de cobertura com ação de upload
+- [x] Invalidar as queries de documentos e de cobertura após upload
+- [x] Tratar e testar os casos de erro de upload
 
 ---
 

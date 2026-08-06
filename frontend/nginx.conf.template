@@ -1,0 +1,44 @@
+# Proxy do frontend.
+#
+# O navegador chama /api/* no proprio host. O nginx encaminha para a API
+# injetando o cabecalho X-Internal-Key, lido do ambiente do container.
+#
+# A chave nunca entra no bundle nem trafega ate o navegador. Qualquer segredo
+# que chegue ao cliente e publico: basta abrir o DevTools.
+
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # A aplicacao e SPA: rota desconhecida devolve o index e o React Router
+    # resolve o caminho.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Fontes e bundles tem hash no nome: cache longo e seguro.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /api/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Internal-Key "${INTERNAL_API_KEY}";
+
+        # A geracao do procedimento leva ate ~70 s: o modelo raciocina antes de
+        # escrever. Com o timeout padrao de 60 s o nginx cortaria a resposta.
+        proxy_connect_timeout 10s;
+        proxy_send_timeout 180s;
+        proxy_read_timeout 180s;
+
+        # Upload de documento.
+        client_max_body_size 25m;
+    }
+}

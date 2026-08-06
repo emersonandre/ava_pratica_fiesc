@@ -12,13 +12,13 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | --- | --- |
 | Features | 16 |
 | Features concluídas | 11 |
-| Tarefas concluídas | 106 / 112 (95%) |
+| Tarefas concluídas | 107 / 112 (96%) |
 
 ## Infraestrutura e dados
 
 | Status | Feature | Tarefas | Aceite |
 | :---: | --- | :---: | :---: |
-| 🟨 | [SPEC-FEAT-001 — Infraestrutura local reproduzível](SPEC-FEAT-001/spec.md) | 9/11 | 3/6 |
+| 🟨 | [SPEC-FEAT-001 — Infraestrutura local reproduzível](SPEC-FEAT-001/spec.md) | 10/11 | 6/6 |
 | ✅ | [SPEC-FEAT-002 — Taxonomia canônica de falhas](SPEC-FEAT-002/spec.md) | 7/7 | 7/7 |
 | ✅ | [SPEC-FEAT-003 — Feature engineering dos sinais de vibração](SPEC-FEAT-003/spec.md) | 6/6 | 6/6 |
 | 🟨 | [SPEC-FEAT-004 — Ingestão do banner.csv com split temporal](SPEC-FEAT-004/spec.md) | 6/7 | 6/7 |

@@ -3,13 +3,13 @@
 **Feature:** Chat prescritivo com citações  
 Marque um item apenas quando ele tiver sido **verificado na prática**, não quando o código parecer pronto.
 
-- [ ] **Prescrição legível por seções**
+- [x] **Prescrição legível por seções**
   - *Verificação:* Diagnóstico, inspeção, correção e validação aparecem separados e na ordem.
 
 - [ ] **Citação abre o trecho real**
   - *Verificação:* Clicar em uma citação exibe o texto do chunk recuperado, com documento e página.
 
-- [ ] **Embasamento exposto**
+- [x] **Embasamento exposto**
   - *Verificação:* O score de grounding aparece na resposta, junto do que foi removido por falta de suporte.
 
 - [ ] **Contexto do evento persiste**
