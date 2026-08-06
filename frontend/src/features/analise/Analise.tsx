@@ -174,7 +174,7 @@ export function Analise() {
 
             <div className="leitura-rodape">
               <dl className="medidas">
-                <Medida rotulo="Rotação" valor={leitura.rpm} unidade="rpm" />
+                <Medida rotulo="Rotação" valor={leitura.rpm} unidade="RPM" />
                 <Medida rotulo="Temperatura" valor={leitura.temperature_c} unidade="°C" />
                 <Medida rotulo="Vibração Z" valor={leitura.z_rms_velocity_mm_s} unidade="mm/s" />
                 <Medida rotulo="Vibração X" valor={leitura.x_rms_velocity_mm_s} unidade="mm/s" />
@@ -317,41 +317,50 @@ function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verda
 
   return (
     <div className="cartao diagnostico">
-      {diagnostico.familia ? (
-        <>
-          <div className="diagnostico-linha">
-            <div>
-              <span className="rotulo">Falha identificada</span>
-              <p className="diagnostico-nome" style={{ color: corDaFamilia(diagnostico.familia) }}>
-                {rotuloFamilia(diagnostico.familia)}
-              </p>
-            </div>
-            <span className={`distintivo distintivo--${acertou ? 'ok' : 'atencao'}`}>
-              {acertou ? 'confere com o rótulo real' : 'diverge do rótulo real'}
+      <div className="diagnostico-linha">
+        <h3
+          className={`diagnostico-nome ${diagnostico.familia ? '' : 'diagnostico-nome--vazio'}`}
+          style={
+            diagnostico.familia ? { color: corDaFamilia(diagnostico.familia) } : undefined
+          }
+        >
+          {diagnostico.familia ? rotuloFamilia(diagnostico.familia) : 'Sinal ambíguo'}
+        </h3>
+        <span
+          className={`distintivo distintivo--${diagnostico.familia && acertou ? 'ok' : 'atencao'}`}
+        >
+          {!diagnostico.familia
+            ? 'sem conclusão'
+            : acertou
+              ? 'confere com o rótulo real'
+              : 'diverge do rótulo real'}
+        </span>
+      </div>
+
+      {/* Evidencia, concordancia e fonte em uma linha so: sao tres fatos curtos
+          sobre o mesmo diagnostico, nao tres paragrafos. */}
+      <p className="diagnostico-meta">
+        {diagnostico.familia ? (
+          <>
+            <b>{vencedor?.vizinhos ?? 0}</b> de {resultado.vizinhos.length} leituras
+            parecidas
+            <span className="diagnostico-sep">·</span>
+            <b>{porcento(diagnostico.confianca)}</b> de concordância
+          </>
+        ) : (
+          <>
+            leituras parecidas não concordam entre si — a mais votada reúne{' '}
+            <b>{porcento(diagnostico.confianca)}</b>
+          </>
+        )}
+        {cobertura.coberta &&
+          cobertura.documentos.map((documento) => (
+            <span key={documento.arquivo}>
+              <span className="diagnostico-sep">·</span>
+              <span className="distintivo distintivo--acento">{documento.arquivo}</span>
             </span>
-          </div>
-          <p className="diagnostico-frase">
-            {vencedor?.vizinhos ?? 0} das {resultado.vizinhos.length} leituras mais
-            parecidas do histórico apresentavam esta mesma falha
-            <b> ({porcento(diagnostico.confianca)} de concordância)</b>.
-          </p>
-        </>
-      ) : (
-        <>
-          <div className="diagnostico-linha">
-            <div>
-              <span className="rotulo">Resultado</span>
-              <p className="diagnostico-nome diagnostico-nome--vazio">Sinal ambíguo</p>
-            </div>
-            <span className="distintivo distintivo--atencao">sem conclusão</span>
-          </div>
-          <p className="diagnostico-frase">
-            As leituras parecidas não concordam entre si — a mais votada reúne só{' '}
-            {porcento(diagnostico.confianca)}. O sistema prefere não opinar a arriscar
-            um diagnóstico errado.
-          </p>
-        </>
-      )}
+          ))}
+      </p>
 
       <div className="votacao">
         <div className="votacao-barra">
@@ -370,17 +379,6 @@ function Diagnostico({ resultado, verdade }: { resultado: RespostaAnalise; verda
           ))}
         </div>
       </div>
-
-      {cobertura.coberta && (
-        <p className="diagnostico-fonte t2">
-          Procedimento disponível:{' '}
-          {cobertura.documentos.map((documento) => (
-            <span key={documento.arquivo} className="distintivo distintivo--acento">
-              {documento.arquivo}
-            </span>
-          ))}
-        </p>
-      )}
     </div>
   )
 }

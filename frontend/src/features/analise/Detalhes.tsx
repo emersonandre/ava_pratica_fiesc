@@ -52,7 +52,7 @@ export function Detalhes({ resultado }: { resultado: RespostaAnalise }) {
                     <dd className="dado">
                       {evidencia.contexto_operacional.rpm_min.toFixed(0)}–
                       {evidencia.contexto_operacional.rpm_max.toFixed(0)}
-                      <span className="t3"> rpm</span>
+                      <span className="t3"> RPM</span>
                     </dd>
                   </div>
                 )}
@@ -71,7 +71,7 @@ export function Detalhes({ resultado }: { resultado: RespostaAnalise }) {
                   <th>Data</th>
                   <th>Condição anotada</th>
                   <th className="num">Semelhança</th>
-                  <th className="num">rpm</th>
+                  <th className="num">RPM</th>
                 </tr>
               </thead>
               <tbody>
