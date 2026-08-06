@@ -65,6 +65,8 @@ export interface Citacao {
   pagina_final: number
   secao: string | null
   metodo: MetodoExtracao
+  /** Texto do trecho como foi entregue ao modelo. Vazio se indisponivel. */
+  trecho: string
 }
 
 export interface Passo {

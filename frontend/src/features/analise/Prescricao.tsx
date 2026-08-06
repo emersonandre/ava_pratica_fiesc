@@ -1,4 +1,5 @@
 import type { Citacao, Passo, Prescricao as TipoPrescricao } from '../../api/types'
+import { FonteCitacao } from './Citacoes'
 import './Prescricao.css'
 
 /** Procedimento recomendado, montado a partir dos manuais.
@@ -54,14 +55,7 @@ export function Prescricao({ prescricao }: { prescricao: TipoPrescricao }) {
       <footer className="procedimento-fontes">
         <span className="rotulo">Baseado em</span>
         {prescricao.citacoes.map((citacao) => (
-          <span
-            key={rotulo(citacao)}
-            className={`distintivo distintivo--${citacao.metodo === 'ocr' ? 'atencao' : 'acento'}`}
-            title={citacao.secao ?? undefined}
-          >
-            {rotulo(citacao)}
-            {citacao.metodo === 'ocr' && ' · OCR'}
-          </span>
+          <FonteCitacao key={rotulo(citacao)} citacao={citacao} />
         ))}
         {temOcr && (
           <p className="t3 procedimento-nota">
@@ -95,15 +89,19 @@ function Secao({
             <div>
               <p>{passo.texto}</p>
               <p className="passo-fontes">
-                {passo.citacoes.map((rotuloCitacao) => (
-                  <span
-                    key={rotuloCitacao}
-                    className="citacao"
-                    title={citacoes.get(rotuloCitacao)?.secao ?? undefined}
-                  >
-                    {rotuloCitacao}
-                  </span>
-                ))}
+                {passo.citacoes.map((marca) => {
+                  const citacao = citacoes.get(marca)
+                  // Rotulo sem citacao correspondente nao deveria chegar aqui --
+                  // a verificacao remove os inventados --, mas se chegar vai
+                  // como texto, e nao some da tela.
+                  return citacao ? (
+                    <FonteCitacao key={marca} citacao={citacao} chaves />
+                  ) : (
+                    <span key={marca} className="fonte">
+                      {marca}
+                    </span>
+                  )
+                })}
               </p>
             </div>
           </li>
@@ -113,10 +111,16 @@ function Secao({
   )
 }
 
+/** Chave de busca, identica byte a byte ao rotulo que o backend emite.
+ *
+ * Nao usa o travessao de `rotuloCitacao`: o backend escreve `p. 4-5` com hifen
+ * comum, e um travessao aqui faria toda citacao de mais de uma pagina falhar em
+ * achar o objeto no mapa -- o passo perdia a fonte em silencio.
+ */
 function rotulo(citacao: Citacao): string {
   const paginas =
     citacao.pagina_inicial === citacao.pagina_final
       ? `p. ${citacao.pagina_inicial}`
-      : `p. ${citacao.pagina_inicial}–${citacao.pagina_final}`
+      : `p. ${citacao.pagina_inicial}-${citacao.pagina_final}`
   return `[${citacao.documento}, ${paginas}]`
 }

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { useChat } from '../../api/queries'
-import type { AmostraHoldout, Citacao, MensagemChat } from '../../api/types'
+import type { AmostraHoldout, MensagemChat } from '../../api/types'
+import { FonteCitacao, rotuloCitacao } from './Citacoes'
 import './Chat.css'
 
 /** Conversa com o assistente, ancorada na leitura analisada.
@@ -172,7 +173,7 @@ function Bolha({ mensagem }: { mensagem: MensagemChat }) {
         {mensagem.citacoes && mensagem.citacoes.length > 0 && (
           <div className="bolha-fontes">
             {mensagem.citacoes.map((citacao) => (
-              <Fonte key={rotulo(citacao)} citacao={citacao} />
+              <FonteCitacao key={rotuloCitacao(citacao)} citacao={citacao} />
             ))}
           </div>
         )}
@@ -186,24 +187,4 @@ function Bolha({ mensagem }: { mensagem: MensagemChat }) {
       </div>
     </div>
   )
-}
-
-function Fonte({ citacao }: { citacao: Citacao }) {
-  return (
-    <span
-      className={`distintivo distintivo--${citacao.metodo === 'ocr' ? 'atencao' : 'acento'}`}
-      title={citacao.secao ?? undefined}
-    >
-      {rotulo(citacao)}
-      {citacao.metodo === 'ocr' && ' · OCR'}
-    </span>
-  )
-}
-
-function rotulo(citacao: Citacao): string {
-  const paginas =
-    citacao.pagina_inicial === citacao.pagina_final
-      ? `p. ${citacao.pagina_inicial}`
-      : `p. ${citacao.pagina_inicial}–${citacao.pagina_final}`
-  return `${citacao.documento}, ${paginas}`
 }

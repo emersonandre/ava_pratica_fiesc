@@ -22,6 +22,14 @@ class Citacao(BaseModel):
     pagina_final: int
     secao: str | None = None
     metodo: str = Field(description="`text` ou `ocr` -- OCR carrega mais risco")
+    trecho: str = Field(
+        default="",
+        description=(
+            "Texto do trecho recuperado, como foi entregue ao modelo. Uma citacao "
+            "que so aponta pagina obriga a acreditar; com o trecho junto, quem le "
+            "confere se a frase esta mesmo la."
+        ),
+    )
 
     @property
     def rotulo(self) -> str:

@@ -1,0 +1,115 @@
+/* Citacao clicavel e o painel do trecho.
+ *
+ * A citacao precisa parecer acionavel sem virar um botao pesado no meio da
+ * frase: sublinhado pontilhado, que e a convencao de "ha algo por tras".
+ */
+
+.fonte {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  font-family: var(--fonte-dado);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  padding: 2px var(--e2);
+  border-radius: var(--raio-p);
+  border: 1px solid transparent;
+  background: var(--acento-fundo);
+  color: var(--acento-claro);
+  white-space: nowrap;
+}
+.fonte--ocr {
+  background: var(--atencao-fundo);
+  color: var(--atencao);
+}
+
+.fonte--acionavel {
+  cursor: pointer;
+  border-color: color-mix(in srgb, currentColor 25%, transparent);
+  text-decoration: underline dotted currentColor;
+  text-underline-offset: 3px;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.fonte--acionavel:hover,
+.fonte--acionavel:focus-visible {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.fonte-ocr {
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+
+/* --- painel do trecho ----------------------------------------------------- */
+
+.trecho-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--e5);
+  background: rgba(4, 8, 18, 0.7);
+  backdrop-filter: blur(3px);
+  animation: trecho-surgir 140ms ease-out;
+}
+
+.trecho {
+  width: min(46rem, 100%);
+  max-height: min(32rem, 80vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--superficie);
+  border: 1px solid var(--borda-clara);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-alta);
+}
+
+.trecho-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--e5);
+  padding: var(--e5) var(--e5) var(--e4);
+  border-bottom: 1px solid var(--borda);
+}
+.trecho-titulo {
+  margin-top: var(--e1);
+  font-family: var(--fonte-dado);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.trecho-secao {
+  margin-top: var(--e1);
+}
+
+/* Texto do manual, nao da interface: medida de leitura curta e entrelinha
+ * folgada, porque o operador le isso para conferir palavra por palavra. */
+.trecho-corpo {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--e5);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--texto);
+  white-space: pre-wrap;
+  border-left: 2px solid var(--acento);
+  background: var(--superficie-2);
+}
+
+.trecho-rodape {
+  padding: var(--e3) var(--e5) var(--e4);
+  border-top: 1px solid var(--borda);
+}
+
+@keyframes trecho-surgir {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trecho-fundo { animation: none; }
+}

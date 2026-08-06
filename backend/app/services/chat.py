@@ -116,6 +116,7 @@ def _citacoes_no_texto(texto: str, trechos: list[TrechoRecuperado]) -> list[Cita
             pagina_final=trecho.pagina_final,
             secao=trecho.secao,
             metodo=trecho.metodo,
+            trecho=trecho.conteudo,
         )
     return list(usadas.values())
 

@@ -125,6 +125,7 @@ def _citacoes_disponiveis(trechos: list[TrechoRecuperado]) -> dict[str, Citacao]
             pagina_final=trecho.pagina_final,
             secao=trecho.secao,
             metodo=trecho.metodo,
+            trecho=trecho.conteudo,
         )
         for trecho in trechos
     }

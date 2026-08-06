@@ -24,14 +24,38 @@ interface Analise {
   leitura?: AmostraHoldout
 }
 
+/** Remove os artefatos de copiar e colar de PDF, Word e Swagger.
+ *
+ * O JSON do enunciado vem de um documento, e o texto chega quebrado em varias
+ * linhas. `JSON.parse` rejeita caractere de controle cru dentro de string --
+ * "Bad control character in string literal" --, e a quebra dentro do
+ * `created_at` derruba o payload inteiro. Word tambem troca aspas retas por
+ * tipograficas e espaco comum por espaco fixo.
+ *
+ * Tudo aqui e ilegal em JSON valido, entao a limpeza nao altera nenhum
+ * documento que ja estivesse correto.
+ */
+function limpar(texto: string): string {
+  return texto
+    .replace(/[\u201c\u201d\u201e\u201f]/g, '"')
+    .replace(/[\u2018\u2019\u201a\u201b]/g, "'")
+    .replace(/[\u00a0\u2000-\u200a\u202f\u205f\u3000]/g, ' ')
+    .replace(/[\u200b-\u200d\ufeff]/g, '')
+    .replace(/[\u0000-\u001f]/g, ' ')
+    .trim()
+}
+
 function validar(texto: string): Analise {
   if (!texto.trim()) return { valida: false, erro: 'Cole um JSON de leitura.' }
 
   let bruto: unknown
   try {
-    bruto = JSON.parse(texto)
+    bruto = JSON.parse(limpar(texto))
   } catch (erro) {
-    return { valida: false, erro: `JSON inválido: ${(erro as Error).message}` }
+    return {
+      valida: false,
+      erro: `JSON inválido: ${(erro as Error).message}. Confira se o texto foi copiado inteiro, do primeiro { ao último }.`,
+    }
   }
 
   if (typeof bruto !== 'object' || bruto === null || Array.isArray(bruto)) {
