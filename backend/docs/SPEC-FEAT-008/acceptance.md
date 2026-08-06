@@ -9,7 +9,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Recusa segue o texto do enunciado**
   - *Verificação:* A resposta informa que não há documento para o problema identificado e sugere registrar um novo documento.
 
-- [ ] **Recusa ainda entrega valor**
+- [x] **Recusa ainda entrega valor**
   - *Verificação:* O payload de recusa traz a família diagnosticada, a contagem de eventos similares e a distribuição temporal.
 
 - [x] **Estado não vira prescrição**
@@ -18,7 +18,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [ ] **Fora de distribuição é distinguido de falta de documento**
   - *Verificação:* Evento fora de distribuição retorna `reason = out_of_distribution`, com mensagem diferente da de documento ausente.
 
-- [ ] **Cobertura se atualiza sozinha**
+- [x] **Cobertura se atualiza sozinha**
   - *Verificação:* Após upload de documento para uma família descoberta, `check_coverage` passa a retornar `is_covered = True` sem reiniciar a API.
 
 - [x] **Mapa é auditável**

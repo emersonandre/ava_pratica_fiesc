@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4.1-mini"
     llm_base_url: str = ""
     llm_temperature: float = 0.1
-    llm_max_tokens: int = 2000
+    llm_max_tokens: int = 16000
     llm_timeout_seconds: int = 60
 
     # --- Visao (OCR offline) ---

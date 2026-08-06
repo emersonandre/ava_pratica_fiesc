@@ -18,5 +18,5 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Confiança discrimina**
   - *Verificação:* Vizinhança unânime produz confiança alta; vizinhança dividida entre duas famílias produz confiança baixa.
 
-- [ ] **Latência aceitável**
+- [x] **Latência aceitável**
   - *Verificação:* `POST /api/events/similar` responde em menos de 300 ms no percentil 95, medido localmente.

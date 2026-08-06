@@ -7,7 +7,7 @@
 - [x] Implementar priorização por seção conforme a intenção
 - [x] Implementar montagem de contexto por orçamento de tokens
 - [x] Escrever `tests/test_retriever.py` com o caso correia × desbalanceamento
-- [ ] Medir a latência da recuperação e incluir no log de etapas
+- [x] Medir a latência da recuperação e incluir no log de etapas
 
 ---
 

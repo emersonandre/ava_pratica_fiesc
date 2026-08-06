@@ -12,7 +12,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Proveniência completa**
   - *Verificação:* Todo `ExtractedPage` tem `document`, `page` e `method` preenchidos; nenhum trecho anônimo.
 
-- [ ] **Páginas de OCR ruim são sinalizadas**
+- [x] **Páginas de OCR ruim são sinalizadas**
   - *Verificação:* Página com confiança abaixo do limiar entra no relatório de revisão em vez de ser aceita em silêncio.
 
 - [x] **Cache evita retrabalho**

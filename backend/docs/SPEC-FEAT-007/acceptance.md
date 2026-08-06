@@ -9,7 +9,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Chunks não cortam procedimento ao meio**
   - *Verificação:* Inspeção dos chunks das seções de procedimento mostra passos completos; caso de teste registrado.
 
-- [ ] **Indexação roda em CPU em tempo aceitável**
+- [x] **Indexação roda em CPU em tempo aceitável**
   - *Verificação:* A indexação completa dos 6 documentos termina em menos de 2 minutos, sem GPU, e o tempo fica no README.
 
 - [x] **Reindexação é idempotente**
