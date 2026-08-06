@@ -15,31 +15,50 @@
 .passo--ultimo .passo-conteudo { padding-bottom: var(--e5); }
 .passo-nota { margin: var(--e1) 0 var(--e4); font-size: 0.875rem; max-width: 62ch; }
 
-.leitura { padding: var(--e5); }
+.leitura { padding: var(--e4) var(--e5); }
+
 .leitura-topo {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  gap: var(--e5); flex-wrap: wrap; padding-bottom: var(--e4);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--e5); flex-wrap: wrap; padding-bottom: var(--e3);
   border-bottom: 1px solid var(--borda);
 }
-.leitura-id { font-size: 1.125rem; margin-top: var(--e1); }
+.leitura-id { font-size: 1rem; margin-top: 2px; }
+
 .leitura-verdade { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: var(--e2); }
-.seletor-condicao { display: flex; align-items: center; gap: var(--e2); }
+
+/* O ponto de cor e o botao ficam DENTRO da mesma caixa do select: assim as tres
+ * pecas tem a mesma altura e leem como um controle so. */
+.seletor-condicao {
+  position: relative;
+  display: flex; align-items: stretch; gap: var(--e2);
+}
 .seletor-condicao select {
-  font-size: 1.0625rem; font-weight: 600; text-align: right;
-  padding: var(--e2) var(--e3); min-width: 15rem;
+  padding: var(--e2) var(--e4) var(--e2) 1.75rem;
+  font-size: 0.9375rem; font-weight: 600; min-width: 16rem;
   background: var(--superficie-2); border-color: var(--borda-clara);
-  cursor: pointer;
+  cursor: pointer; line-height: 1.4;
 }
 .seletor-condicao select:hover:not(:disabled) { border-color: var(--acento); }
+.seletor-condicao select option { color: var(--texto); background: var(--superficie-2); font-weight: 400; }
+.seletor-cor {
+  position: absolute; left: var(--e3); top: 50%; transform: translateY(-50%);
+  width: .5rem; height: .5rem; border-radius: 50%; pointer-events: none; z-index: 1;
+}
 .seletor-sortear {
-  padding: var(--e2) var(--e3); min-width: 2.5rem;
+  padding: 0 var(--e3); min-width: 2.5rem;
   font-size: 1rem; line-height: 1;
 }
-.medidas {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem,1fr));
-  gap: var(--e4); margin: var(--e4) 0 0;
+
+.leitura-rodape {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--e5); flex-wrap: wrap; margin-top: var(--e3);
 }
-.medida-valor { font-size: 1.25rem; margin-top: var(--e1); }
+.medidas {
+  display: flex; flex-wrap: wrap; gap: var(--e3) var(--e6); margin: 0;
+}
+.medidas > div { display: flex; align-items: baseline; gap: var(--e2); }
+.medidas dt { font-size: 0.75rem; color: var(--texto-3); }
+.medida-valor { font-size: 0.9375rem; }
 
 .avancado-alternar { margin-top: var(--e4); padding-left: 0; }
 .avancado {

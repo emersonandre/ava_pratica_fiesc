@@ -125,15 +125,22 @@ export function Analise() {
 
               <div className="leitura-verdade">
                 <label className="rotulo" htmlFor="seletor-condicao">
-                  Condição real anotada pelo operador
+                  Condição anotada pelo operador
                 </label>
                 <div className="seletor-condicao">
+                  {/* A cor identifica a familia. Fica num ponto ao lado, nao no
+                      texto do select: cor aplicada no <select> vaza para todas
+                      as <option> e pinta a lista inteira. */}
+                  <span
+                    className="seletor-cor"
+                    style={{ background: corDaFamilia(familia || leitura.fault_family) }}
+                    aria-hidden="true"
+                  />
                   <select
                     id="seletor-condicao"
                     value={familia || leitura.fault_family}
                     onChange={(e) => trocarCondicao(e.target.value)}
                     disabled={amostra.isPending}
-                    style={{ color: corDaFamilia(familia || leitura.fault_family) }}
                   >
                     <option value="">Qualquer condição</option>
                     {(familias.data ?? [])
@@ -165,17 +172,19 @@ export function Analise() {
               </div>
             </div>
 
-            <dl className="medidas">
-              <Medida rotulo="Rotação" valor={leitura.rpm} unidade="rpm" />
-              <Medida rotulo="Temperatura" valor={leitura.temperature_c} unidade="°C" />
-              <Medida rotulo="Vibração eixo Z" valor={leitura.z_rms_velocity_mm_s} unidade="mm/s" />
-              <Medida rotulo="Vibração eixo X" valor={leitura.x_rms_velocity_mm_s} unidade="mm/s" />
-            </dl>
+            <div className="leitura-rodape">
+              <dl className="medidas">
+                <Medida rotulo="Rotação" valor={leitura.rpm} unidade="rpm" />
+                <Medida rotulo="Temperatura" valor={leitura.temperature_c} unidade="°C" />
+                <Medida rotulo="Vibração Z" valor={leitura.z_rms_velocity_mm_s} unidade="mm/s" />
+                <Medida rotulo="Vibração X" valor={leitura.x_rms_velocity_mm_s} unidade="mm/s" />
+              </dl>
 
-            <button type="button" className="botao-texto avancado-alternar"
-              onClick={() => setAvancado(!avancado)} aria-expanded={avancado}>
-              {avancado ? '− Ocultar' : '+ Mostrar'} opções de demonstração
-            </button>
+              <button type="button" className="botao-texto avancado-alternar"
+                onClick={() => setAvancado(!avancado)} aria-expanded={avancado}>
+                {avancado ? 'Ocultar opções' : 'Opções de demonstração'}
+              </button>
+            </div>
 
             {avancado && (
               <div className="avancado">
