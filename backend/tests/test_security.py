@@ -104,7 +104,7 @@ def test_resposta_do_token_traz_expiracao_e_escopos(client: TestClient) -> None:
     corpo = resposta.json()
     assert corpo["token_type"] == "bearer"
     assert corpo["expires_in"] == 3600
-    assert set(corpo["scopes"]) == {"predict", "upload"}
+    assert set(corpo["scopes"]) == {"predict", "upload", "ingest"}
 
 
 # --- Aceite: credencial errada nao emite token -------------------------------

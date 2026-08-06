@@ -119,6 +119,7 @@ def analisar_evento(
     k: int | None = None,
     confianca_minima: float | None = None,
     gerar_prescricao: bool = True,
+    excluir_id: int | None = None,
 ) -> ResultadoAnalise:
     """Fluxo completo, do JSON de sensor a prescricao ou recusa."""
     settings = get_settings()
@@ -129,7 +130,7 @@ def analisar_evento(
     scaler = load_scaler(settings.artifacts_path)
     vetor = to_vector(scaler, payload)
     resultado = similarity.analisar(
-        session, vetor.tolist(), k=k, confianca_minima=confianca_minima
+        session, vetor.tolist(), k=k, confianca_minima=confianca_minima, excluir_id=excluir_id
     )
     tempos.similaridade_ms = cronometro.parar()
 

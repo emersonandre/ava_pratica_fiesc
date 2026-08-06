@@ -14,9 +14,15 @@ from sqlalchemy.orm import Session
 
 from app.models import SensorEvent
 
-# Toda busca por similaridade e restrita ao historico. Buscar dentro do holdout
-# seria vazamento -- e o indice HNSW e parcial justamente sobre esse filtro.
-SPLIT_HISTORICO = "train"
+# Toda busca por similaridade e restrita ao historico anotado.
+#
+# Fora ficam o holdout (buscar la seria vazamento) e as leituras sem rotulo
+# (nao ha condicao anotada para votar). O indice HNSW e parcial exatamente sobre
+# este filtro -- se a condicao aqui mudar, o indice precisa mudar junto, senao o
+# pos-filtro do pgvector volta a devolver resultado vazio.
+SPLIT_HOLDOUT = "holdout"
+SPLIT_PRODUCAO = "producao"
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,7 +42,9 @@ class Vizinho:
         return 1.0 - self.distance
 
 
-def buscar_vizinhos(session: Session, vetor: list[float], *, k: int) -> list[Vizinho]:
+def buscar_vizinhos(
+    session: Session, vetor: list[float], *, k: int, excluir_id: int | None = None
+) -> list[Vizinho]:
     """k vizinhos mais proximos no historico, por distancia cosseno."""
     # `hnsw.ef_search` limita quantos candidatos o indice examina; o padrao e 40.
     # Pedir k=50 com ef_search=40 devolve menos de 50 linhas em silencio -- foi
@@ -63,7 +71,14 @@ def buscar_vizinhos(session: Session, vetor: list[float], *, k: int) -> list[Viz
             SensorEvent.temperature_c,
             distancia,
         )
-        .where(SensorEvent.split == SPLIT_HISTORICO)
+        .where(
+            SensorEvent.split != SPLIT_HOLDOUT,
+            SensorEvent.fault_family.is_not(None),
+            # Uma leitura recem-ingerida nao pode ser vizinha de si mesma: o vetor
+            # consultado e o dela, entao apareceria com similaridade 1,0 e
+            # dominaria a votacao.
+            SensorEvent.id != excluir_id if excluir_id is not None else text("true"),
+        )
         .order_by(distancia)
         .limit(k)
     ).all()
@@ -89,7 +104,7 @@ def serie_temporal(session: Session, familia: str) -> list[Row]:
     return session.execute(
         select(dia, func.count().label("total"))
         .where(
-            SensorEvent.split == SPLIT_HISTORICO,
+            SensorEvent.split != SPLIT_HOLDOUT,
             SensorEvent.fault_family == familia,
         )
         .group_by(dia)
@@ -111,7 +126,7 @@ def estatisticas_familia(session: Session, familia: str) -> Row | None:
             func.max(SensorEvent.temperature_c).label("temp_max"),
             func.avg(SensorEvent.temperature_c).label("temp_media"),
         ).where(
-            SensorEvent.split == SPLIT_HISTORICO,
+            SensorEvent.split != SPLIT_HOLDOUT,
             SensorEvent.fault_family == familia,
         )
     ).one_or_none()
@@ -125,7 +140,9 @@ def familias_com_historico(session: Session) -> set[str]:
     """
     return set(
         session.scalars(
-            select(SensorEvent.fault_family).where(SensorEvent.split == SPLIT_HISTORICO).distinct()
+            select(SensorEvent.fault_family)
+            .where(SensorEvent.split != SPLIT_HOLDOUT, SensorEvent.fault_family.is_not(None))
+            .distinct()
         ).all()
     )
 

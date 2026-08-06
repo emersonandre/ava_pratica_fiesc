@@ -29,8 +29,8 @@ from app.settings import Settings, get_settings
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
-Scope = Literal["predict", "upload"]
-ALL_SCOPES: tuple[Scope, ...] = ("predict", "upload")
+Scope = Literal["predict", "upload", "ingest"]
+ALL_SCOPES: tuple[Scope, ...] = ("predict", "upload", "ingest")
 
 
 class TokenClaims(BaseModel):

@@ -310,3 +310,112 @@ def test_arquivos_do_enunciado_existem() -> None:
     arquivos = BACKEND_DIR.parent / "arquivos"
     assert len(list(arquivos.glob("Doc*.pdf"))) == 6
     assert Path(BACKEND_DIR.parent / "dados" / "banner.csv").exists()
+
+
+# --- SPEC-FEAT-017: ingestao de leituras -------------------------------------
+def _limpar_producao() -> None:
+    from sqlalchemy import delete
+
+    from app.database import session_scope
+    from app.models import SensorEvent
+
+    with session_scope() as sessao:
+        sessao.execute(delete(SensorEvent).where(SensorEvent.split == "producao"))
+
+
+@pytest.fixture(autouse=True, scope="module")
+def _sem_residuo_de_producao():
+    """Leituras de teste nao podem ficar na base: virariam vizinhas reais."""
+    yield
+    _limpar_producao()
+
+
+def test_json_do_enunciado_e_ingerido(client, externo, base_populada) -> None:
+    payload = {**PAYLOAD_DO_ENUNCIADO, "id": 990000001}
+    resposta = client.post("/api/v1/events", headers=externo, json={"leituras": [payload]})
+
+    assert resposta.status_code == 201, resposta.text
+    leitura = resposta.json()["leituras"][0]
+    assert leitura["condicao_bruta"] == "cocked_rotor_2"
+    assert leitura["condicao_canonica"] == "cocked_rotor"
+    assert leitura["familia"] == "cocked_rotor"
+    assert leitura["anotada"] is True
+
+
+def test_reenvio_atualiza_em_vez_de_duplicar(client, externo, base_populada) -> None:
+    payload = {**PAYLOAD_DO_ENUNCIADO, "id": 990000002}
+    client.post("/api/v1/events", headers=externo, json={"leituras": [payload]})
+    segunda = client.post("/api/v1/events", headers=externo, json={"leituras": [payload]})
+
+    assert segunda.json()["atualizadas"] == 1
+    assert segunda.json()["leituras"][0]["ja_existia"] is True
+
+
+def test_leitura_sem_rotulo_e_gravada_sem_classificacao(client, externo, base_populada) -> None:
+    """O dado do sensor vale mais que o rotulo: guarda em vez de recusar."""
+    payload = {k: v for k, v in PAYLOAD_DO_ENUNCIADO.items() if k != "fault"}
+    payload["id"] = 990000003
+
+    resposta = client.post("/api/v1/events", headers=externo, json={"leituras": [payload]})
+
+    assert resposta.status_code == 201
+    leitura = resposta.json()["leituras"][0]
+    assert leitura["anotada"] is False
+    assert leitura["familia"] is None
+
+
+def test_rotulo_desconhecido_nao_derruba_o_lote(client, externo, base_populada) -> None:
+    payload = {**PAYLOAD_DO_ENUNCIADO, "id": 990000004, "fault": "condicao_inexistente"}
+    resposta = client.post("/api/v1/events", headers=externo, json={"leituras": [payload]})
+
+    assert resposta.status_code == 201
+    assert resposta.json()["rotulos_desconhecidos"] == ["condicao_inexistente"]
+    assert resposta.json()["leituras"][0]["anotada"] is False
+
+
+def test_leitura_recem_gravada_nao_e_vizinha_de_si_mesma(
+    client, externo, base_populada
+) -> None:
+    """Ela entra no split de producao, que o indice cobre -- teria similaridade 1,0."""
+    payload = {**PAYLOAD_DO_ENUNCIADO, "id": 990000005}
+    resposta = client.post(
+        "/api/v1/events", headers=externo, json={"leituras": [payload], "analisar": True}
+    )
+
+    corpo = resposta.json()
+    assert corpo["analise"] is not None
+    assert all(vizinho["id"] != 990000005 for vizinho in corpo["analise"]["vizinhos"])
+
+
+def test_lote_sem_id_gera_identificadores(client, externo, base_populada) -> None:
+    leituras = [
+        {k: v for k, v in PAYLOAD_DO_ENUNCIADO.items() if k != "id"} for _ in range(3)
+    ]
+    resposta = client.post("/api/v1/events", headers=externo, json={"leituras": leituras})
+
+    corpo = resposta.json()
+    assert corpo["gravadas"] == 3
+    ids = [leitura["id"] for leitura in corpo["leituras"]]
+    assert len(set(ids)) == 3, "os identificadores gerados devem ser distintos"
+
+
+def test_ingestao_exige_escopo_proprio(client, base_populada) -> None:
+    token = client.post(
+        "/api/v1/auth/token",
+        json={
+            "client_id": _variavel("API_CLIENT_ID"),
+            "client_secret": _variavel("API_CLIENT_SECRET"),
+            "scopes": ["predict"],
+        },
+    ).json()["access_token"]
+
+    resposta = client.post(
+        "/api/v1/events",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"leituras": [PAYLOAD_DO_ENUNCIADO]},
+    )
+    assert resposta.status_code == 403
+
+
+def test_lote_vazio_e_recusado(client, externo) -> None:
+    assert client.post("/api/v1/events", headers=externo, json={"leituras": []}).status_code == 422

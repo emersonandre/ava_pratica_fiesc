@@ -122,6 +122,7 @@ def analisar(
     *,
     k: int | None = None,
     confianca_minima: float | None = None,
+    excluir_id: int | None = None,
 ) -> SimilarityResult:
     """Diagnostica um evento pela vizinhanca historica, ou se abstem."""
     settings = get_settings()
@@ -130,7 +131,7 @@ def analisar(
         confianca_minima if confianca_minima is not None else settings.similarity_confidence_min
     )
 
-    vizinhos = repo.buscar_vizinhos(session, vetor, k=k)
+    vizinhos = repo.buscar_vizinhos(session, vetor, k=k, excluir_id=excluir_id)
     if not vizinhos:
         return SimilarityResult(
             familia_diagnosticada=None,

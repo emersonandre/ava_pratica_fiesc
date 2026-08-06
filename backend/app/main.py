@@ -29,6 +29,7 @@ from app.controllers.internal import chat as internal_chat
 from app.controllers.internal import events as internal_events
 from app.controllers.internal import stats as internal_stats
 from app.controllers.v1 import auth as v1_auth
+from app.controllers.v1 import events as v1_events
 from app.controllers.v1 import predict as v1_predict
 from app.controllers.v1 import upload_doc as v1_upload
 from app.middleware.logging import LogDeRequisicao
@@ -82,6 +83,7 @@ def create_app() -> FastAPI:
 
     application.include_router(health.router)
     application.include_router(v1_auth.router)
+    application.include_router(v1_events.router)
     application.include_router(v1_predict.router)
     application.include_router(v1_upload.router)
     application.include_router(internal_events.router)

@@ -21,14 +21,23 @@ class SensorEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
 
     # Rotulo bruto preservado para auditoria; canonico e familia vem da SPEC-FEAT-002.
-    raw_fault: Mapped[str] = mapped_column(String(80))
-    canonical_fault: Mapped[str] = mapped_column(String(80), index=True)
-    fault_family: Mapped[str] = mapped_column(String(40), index=True)
-    is_problem: Mapped[bool] = mapped_column(Boolean)
+    #
+    # Nulos sao permitidos porque o chao de fabrica envia leitura antes de haver
+    # anotacao: o sensor mede continuamente, o operador classifica depois (ou
+    # nunca). Uma leitura sem rotulo entra no historico para registro, mas nao
+    # pode votar numa busca por similaridade -- nao ha rotulo para votar.
+    raw_fault: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    canonical_fault: Mapped[str | None] = mapped_column(String(80), index=True, nullable=True)
+    fault_family: Mapped[str | None] = mapped_column(String(40), index=True, nullable=True)
+    is_problem: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
 
-    # `train` = ate 09/jun; `holdout` = rotulos new_*, de 10 a 16/jun.
-    # Corte temporal natural do dataset, sem sorteio -- evita que amostras da mesma
-    # sessao de ensaio (coletadas com segundos de diferenca) caiam dos dois lados.
+    # `train`    ate 09/jun, base historica do dataset entregue
+    # `holdout`  rotulos new_*, de 10 a 16/jun -- reservado para avaliacao
+    # `producao` leituras recebidas pela API depois da entrega
+    #
+    # O corte train/holdout e temporal e natural, sem sorteio: evita que amostras
+    # da mesma sessao de ensaio (coletadas com segundos de diferenca) caiam dos
+    # dois lados e inflem a acuracia medida.
     split: Mapped[str] = mapped_column(String(10), index=True)
 
     # Colunas metricas originais, preservadas para exibicao e analise.
@@ -54,24 +63,30 @@ class SensorEvent(Base):
     features: Mapped[list[float]] = mapped_column(Vector(FEATURE_DIM))
 
     __table_args__ = (
-        CheckConstraint("split IN ('train','holdout')", name="ck_sensor_events_split"),
-        # Indice PARCIAL, restrito ao split de treino.
+        CheckConstraint(
+            "split IN ('train','holdout','producao')", name="ck_sensor_events_split"
+        ),
+        # Indice PARCIAL, cobrindo exatamente o que pode ser vizinho.
         #
-        # O HNSW do pgvector faz pos-filtro: encontra os k vizinhos mais proximos
-        # e so depois aplica o WHERE. Com um indice sobre a tabela inteira e uma
-        # consulta partindo de um evento do holdout, os vizinhos mais proximos sao
-        # os proprios registros do holdout (mesma sessao de ensaio) -- todos
-        # descartados pelo filtro, e a busca retorna vazio.
+        # Duas exclusoes, por motivos diferentes:
         #
-        # Como toda busca por similaridade e restrita ao historico por definicao
-        # (buscar dentro do holdout seria vazamento), o filtro entra no proprio
-        # indice. Resolve a corretude e ainda deixa o indice menor.
+        # 1. `holdout` fica de fora porque buscar la seria vazamento -- e o
+        #    conjunto reservado para medir o desempenho.
+        # 2. Leitura sem rotulo fica de fora porque nao tem como votar: a
+        #    similaridade decide pela condicao anotada dos vizinhos.
+        #
+        # O filtro precisa estar no INDICE, nao so na consulta. O HNSW do pgvector
+        # faz pos-filtro: encontra os k vizinhos e so depois aplica o WHERE. Com um
+        # indice sobre a tabela inteira e uma consulta partindo de um evento do
+        # holdout, os vizinhos mais proximos sao os proprios registros do holdout
+        # (mesma sessao de ensaio) -- todos descartados pelo filtro, e a busca
+        # retorna VAZIO. Aconteceu na pratica durante a implementacao.
         Index(
             "ix_sensor_events_features_hnsw",
             "features",
             postgresql_using="hnsw",
             postgresql_ops={"features": "vector_cosine_ops"},
-            postgresql_where=text("split = 'train'"),
+            postgresql_where=text("split <> 'holdout' AND fault_family IS NOT NULL"),
         ),
     )
 

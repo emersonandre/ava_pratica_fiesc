@@ -10,9 +10,9 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 
 | | |
 | --- | --- |
-| Features | 16 |
-| Features concluídas | 11 |
-| Tarefas concluídas | 107 / 112 (96%) |
+| Features | 17 |
+| Features concluídas | 12 |
+| Tarefas concluídas | 117 / 122 (96%) |
 
 ## Infraestrutura e dados
 
@@ -47,5 +47,6 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | :---: | --- | :---: | :---: |
 | ✅ | [SPEC-FEAT-013 — API REST](SPEC-FEAT-013/spec.md) | 8/8 | 9/9 |
 | ✅ | [SPEC-FEAT-014 — Registro de novo documento de falha](SPEC-FEAT-014/spec.md) | 7/7 | 6/6 |
+| ✅ | [SPEC-FEAT-017 — Ingestão de leituras do chão de fábrica](SPEC-FEAT-017/spec.md) | 10/10 | 9/9 |
 | ✅ | [SPEC-FEAT-016 — Autenticação: JWT externo e chave interna](SPEC-FEAT-016/spec.md) | 8/8 | 9/9 |
 | 🟨 | [SPEC-FEAT-015 — Testes, qualidade e observabilidade](SPEC-FEAT-015/spec.md) | 3/6 | 1/6 |
