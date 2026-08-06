@@ -8,45 +8,44 @@
   margin: 0;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
 body {
   background: var(--fundo);
   color: var(--texto);
-  font-family: var(--fonte-corpo);
+  font-family: var(--fonte);
   font-size: 0.9375rem;
-  line-height: 1.55;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  /* Numeros tabulares em toda a aplicacao: medicao que dansa ao atualizar e
-   * ilegivel em painel operacional. */
   font-variant-numeric: tabular-nums;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--fonte-titulo);
   font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 h2 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
 }
 h3 {
-  font-size: 0.9375rem;
+  font-size: 1rem;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
-  color: var(--instrumento-forte);
-  text-decoration-color: color-mix(in srgb, var(--instrumento-forte) 40%, transparent);
-  text-underline-offset: 2px;
+  color: var(--acento-claro);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
 button,
@@ -58,8 +57,9 @@ textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--instrumento-forte);
-  outline-offset: 2px;
+  outline: 2px solid var(--acento);
+  outline-offset: 3px;
+  border-radius: var(--raio-p);
 }
 
 ::-webkit-scrollbar {
@@ -67,22 +67,20 @@ textarea {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--fundo);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--linha-forte);
-  border-radius: 5px;
+  background: var(--borda-clara);
+  border-radius: var(--raio-pill);
 }
 
-/* --- utilitarios de texto ------------------------------------------------ */
+/* --- texto --------------------------------------------------------------- */
 
 .rotulo {
-  font-family: var(--fonte-titulo);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--texto-fraco);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--texto-3);
 }
 
 .dado {
@@ -90,35 +88,167 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
-.fraco {
-  color: var(--texto-fraco);
+.t2 {
+  color: var(--texto-2);
 }
-.medio {
-  color: var(--texto-medio);
+.t3 {
+  color: var(--texto-3);
 }
 
-/* --- superficies --------------------------------------------------------- */
+/* --- cartao -------------------------------------------------------------- */
 
-.painel {
-  background: var(--painel);
-  border: 1px solid var(--linha);
+.cartao {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
   border-radius: var(--raio);
+  box-shadow: var(--sombra);
 }
 
-.painel-cabecalho {
+.cartao-topo {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--e4);
-  padding: var(--e4) var(--e5);
-  border-bottom: 1px solid var(--linha);
+  padding: var(--e5) var(--e5) 0;
 }
 
-.painel-corpo {
+.cartao-corpo {
   padding: var(--e5);
 }
 
-/* --- tabelas ------------------------------------------------------------- */
+/* --- botoes -------------------------------------------------------------- */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e2);
+  padding: 0.625rem var(--e5);
+  background: var(--superficie-3);
+  border: 1px solid var(--borda-clara);
+  border-radius: var(--raio-p);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.botao:hover:not(:disabled) {
+  background: var(--superficie-3);
+  border-color: var(--acento);
+}
+
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.botao:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.botao-primario {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: #04101f;
+  font-weight: 600;
+}
+
+.botao-primario:hover:not(:disabled) {
+  background: var(--acento-claro);
+  border-color: var(--acento-claro);
+}
+
+.botao-grande {
+  padding: 0.875rem var(--e6);
+  font-size: 1rem;
+}
+
+.botao-texto {
+  padding: var(--e2) var(--e3);
+  background: none;
+  border: none;
+  color: var(--texto-2);
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: var(--raio-p);
+}
+
+.botao-texto:hover {
+  color: var(--texto);
+  background: var(--superficie-2);
+}
+
+/* --- campos -------------------------------------------------------------- */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e2);
+}
+
+input[type='text'],
+input:not([type]),
+select,
+textarea {
+  padding: 0.625rem var(--e4);
+  background: var(--superficie-2);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  font-size: 0.9375rem;
+  transition: border-color 140ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--acento);
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--texto-3);
+}
+
+/* --- distintivo ---------------------------------------------------------- */
+
+.distintivo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  padding: 0.1875rem var(--e3);
+  border-radius: var(--raio-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.distintivo--ok {
+  color: var(--ok);
+  background: var(--ok-fundo);
+}
+.distintivo--atencao {
+  color: var(--atencao);
+  background: var(--atencao-fundo);
+}
+.distintivo--perigo {
+  color: var(--perigo);
+  background: var(--perigo-fundo);
+}
+.distintivo--acento {
+  color: var(--acento-claro);
+  background: var(--acento-fundo);
+}
+.distintivo--neutro {
+  color: var(--texto-3);
+  background: var(--superficie-3);
+}
+
+/* --- tabela -------------------------------------------------------------- */
 
 table {
   width: 100%;
@@ -128,24 +258,25 @@ table {
 
 th {
   text-align: left;
-  font-family: var(--fonte-titulo);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--texto-fraco);
-  padding: var(--e2) var(--e3);
-  border-bottom: 1px solid var(--linha);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--texto-3);
+  padding: var(--e3);
+  border-bottom: 1px solid var(--borda);
   white-space: nowrap;
 }
 
 td {
-  padding: var(--e2) var(--e3);
-  border-bottom: 1px solid color-mix(in srgb, var(--linha) 55%, transparent);
+  padding: var(--e3);
+  border-bottom: 1px solid color-mix(in srgb, var(--borda) 50%, transparent);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
 }
 
 tbody tr:hover td {
-  background: color-mix(in srgb, var(--instrumento) 6%, transparent);
+  background: var(--superficie-2);
 }
 
 .num {
@@ -153,46 +284,11 @@ tbody tr:hover td {
   font-family: var(--fonte-dado);
 }
 
-/* --- botoes -------------------------------------------------------------- */
-
-.botao {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e2);
-  padding: var(--e2) var(--e4);
-  background: var(--painel-alto);
-  border: 1px solid var(--linha-forte);
-  border-radius: var(--raio);
-  font-family: var(--fonte-titulo);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: border-color 120ms, background 120ms;
-}
-
-.botao:hover:not(:disabled) {
-  border-color: var(--instrumento);
-  background: color-mix(in srgb, var(--instrumento) 12%, var(--painel-alto));
-}
-
-.botao:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.botao-primario {
-  background: color-mix(in srgb, var(--instrumento) 22%, var(--painel-alto));
-  border-color: var(--instrumento);
-  color: var(--instrumento-forte);
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

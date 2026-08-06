@@ -1,191 +1,50 @@
-.aplicacao {
-  display: grid;
-  grid-template-columns: var(--largura-rail) minmax(0, 1fr);
-  min-height: 100vh;
-}
-
-/* --- barra lateral -------------------------------------------------------- */
+.aplicacao { display: grid; grid-template-columns: var(--largura-rail) minmax(0,1fr); min-height: 100vh; }
 
 .rail {
-  display: flex;
-  flex-direction: column;
-  gap: var(--e6);
-  padding: var(--e5) var(--e4);
-  background: var(--painel);
-  border-right: 1px solid var(--linha);
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  display: flex; flex-direction: column; gap: var(--e6);
+  padding: var(--e6) var(--e4);
+  background: var(--superficie); border-right: 1px solid var(--borda);
+  position: sticky; top: 0; height: 100vh;
 }
 
-.placa {
-  padding-bottom: var(--e4);
-  border-bottom: 2px solid var(--linha-forte);
+.marca { display: flex; align-items: center; gap: var(--e3); padding: 0 var(--e3); }
+.marca-icone {
+  display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: none;
+  border-radius: var(--raio-p);
+  background: linear-gradient(135deg, var(--acento), var(--roxo));
+  color: #04101f; font-weight: 700; font-size: 0.9375rem;
 }
+.marca-nome { font-size: 0.9375rem; font-weight: 600; line-height: 1.25; }
+.marca-sub { font-size: 0.75rem; color: var(--texto-3); }
 
-.placa-linha {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--e2);
-  margin-bottom: var(--e3);
-  font-size: 0.75rem;
-  color: var(--instrumento);
-}
-
-.placa-titulo {
-  font-size: 1.375rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.05;
-}
-
-.placa-sub {
-  margin-top: var(--e2);
-  font-size: 0.75rem;
-  color: var(--texto-fraco);
-}
-
-.menu {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
+.menu { display: flex; flex-direction: column; gap: var(--e1); }
 .menu-item {
-  padding: var(--e2) var(--e3);
-  border-left: 2px solid transparent;
-  border-radius: 0 2px 2px 0;
-  color: var(--texto-medio);
-  font-family: var(--fonte-titulo);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  transition: color 120ms, background 120ms, border-color 120ms;
+  padding: var(--e3) var(--e4); border-radius: var(--raio-p);
+  color: var(--texto-2); font-size: 0.9375rem; font-weight: 500;
+  transition: background 140ms ease, color 140ms ease;
 }
+.menu-item:hover { background: var(--superficie-2); color: var(--texto); text-decoration: none; }
+.menu-item--ativo { background: var(--acento-fundo); color: var(--acento-claro); }
 
-.menu-item:hover {
-  color: var(--texto);
-  background: color-mix(in srgb, var(--instrumento) 8%, transparent);
-}
+.rail-rodape { margin-top: auto; display: flex; flex-direction: column; gap: var(--e3); padding: 0 var(--e3); }
+.saude { display: inline-flex; align-items: center; gap: var(--e2); font-size: 0.8125rem; font-weight: 500; }
+.saude::before { content: ''; width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; flex: none; }
+.saude--ok { color: var(--ok); }
+.saude--degradado { color: var(--atencao); }
+.saude--fora { color: var(--perigo); }
+.saude--carregando { color: var(--texto-3); }
+.rail-nota { font-size: 0.6875rem; color: var(--texto-3); line-height: 1.5; }
 
-.menu-item--ativo {
-  color: var(--instrumento-forte);
-  border-left-color: var(--instrumento);
-  background: color-mix(in srgb, var(--instrumento) 12%, transparent);
-}
-
-.rail-rodape {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--e3);
-}
-
-.saude {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e2);
-  font-family: var(--fonte-titulo);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.saude::before {
-  content: '';
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: currentColor;
-  flex: none;
-}
-
-.saude--ok {
-  color: var(--zona-a);
-}
-.saude--degradado {
-  color: var(--zona-b);
-}
-.saude--fora {
-  color: var(--zona-d);
-}
-.saude--carregando {
-  color: var(--texto-fraco);
-}
-
-.rail-nota {
-  font-size: 0.6875rem;
-  color: var(--texto-fraco);
-  line-height: 1.4;
-}
-
-/* --- conteudo ------------------------------------------------------------- */
-
-.conteudo {
-  padding: var(--e6) var(--e7);
-  max-width: 84rem;
-  width: 100%;
-}
-
-.pagina-cabecalho {
-  margin-bottom: var(--e6);
-}
-
-.pagina-cabecalho h1 {
-  font-size: 1.75rem;
-}
-
-.pagina-cabecalho p {
-  margin-top: var(--e2);
-  color: var(--texto-medio);
-  max-width: 68ch;
-}
+.conteudo { padding: var(--e7) var(--e7) var(--e8); max-width: var(--largura-max); width: 100%; }
 
 @media (max-width: 60rem) {
-  .aplicacao {
-    grid-template-columns: 1fr;
-  }
-
+  .aplicacao { grid-template-columns: 1fr; }
   .rail {
-    position: static;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--e5);
-    flex-wrap: wrap;
-    border-right: none;
-    border-bottom: 1px solid var(--linha);
+    position: static; height: auto; flex-direction: row; align-items: center;
+    gap: var(--e5); flex-wrap: wrap; padding: var(--e4);
+    border-right: none; border-bottom: 1px solid var(--borda);
   }
-
-  .placa {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .placa-titulo br {
-    display: none;
-  }
-
-  .menu {
-    flex-direction: row;
-  }
-
-  .menu-item {
-    border-left: none;
-    border-bottom: 2px solid transparent;
-  }
-
-  .menu-item--ativo {
-    border-bottom-color: var(--instrumento);
-  }
-
-  .rail-rodape {
-    margin-top: 0;
-  }
-
-  .conteudo {
-    padding: var(--e5) var(--e4);
-  }
+  .menu { flex-direction: row; }
+  .rail-rodape { margin-top: 0; margin-left: auto; }
+  .conteudo { padding: var(--e5) var(--e4) var(--e7); }
 }

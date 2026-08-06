@@ -1,64 +1,80 @@
-.entrada-corpo { display: flex; flex-direction: column; gap: var(--e5); }
+.cabecalho { margin-bottom: var(--e7); max-width: 62ch; }
+.cabecalho p { margin-top: var(--e2); font-size: 1rem; }
 
-.leitura {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: var(--e4) var(--e5);
-  margin: 0;
-  padding: var(--e4);
-  background: var(--fundo);
-  border: 1px solid var(--linha);
-  border-radius: var(--raio);
+.passo { display: grid; grid-template-columns: 2.5rem minmax(0,1fr); gap: var(--e4); }
+.passo-marca { display: flex; flex-direction: column; align-items: center; }
+.passo-numero {
+  display: grid; place-items: center; width: 2rem; height: 2rem; flex: none;
+  border-radius: 50%; background: var(--superficie-2);
+  border: 1px solid var(--borda-clara);
+  font-size: 0.875rem; font-weight: 600; color: var(--texto-2);
 }
-.medida dd { margin: var(--e1) 0 0; font-size: 1.0625rem; }
-.medida-unidade { font-size: 0.75rem; color: var(--texto-fraco); }
+.passo-numero--feito { background: var(--acento); border-color: var(--acento); color: #04101f; }
+.passo-linha { flex: 1; width: 1px; background: var(--borda); margin: var(--e2) 0; }
+.passo-conteudo { padding-bottom: var(--e6); min-width: 0; }
+.passo--ultimo .passo-conteudo { padding-bottom: var(--e5); }
+.passo-nota { margin: var(--e1) 0 var(--e4); font-size: 0.875rem; max-width: 62ch; }
 
-.entrada-acoes { display: flex; align-items: flex-end; gap: var(--e3); flex-wrap: wrap; }
-.campo { display: flex; flex-direction: column; gap: var(--e2); flex: 1 1 18rem; }
-.campo input, .campo select, .seletor {
-  padding: var(--e2) var(--e3);
-  background: var(--fundo);
-  border: 1px solid var(--linha-forte);
-  border-radius: var(--raio);
-  font-size: 0.875rem;
+.leitura { padding: var(--e5); }
+.leitura-topo {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--e5); flex-wrap: wrap; padding-bottom: var(--e4);
+  border-bottom: 1px solid var(--borda);
 }
-.campo input:focus, .campo select:focus { border-color: var(--instrumento); }
-.seletor { font-family: var(--fonte-titulo); font-size: 0.8125rem; }
+.leitura-id { font-size: 1.125rem; margin-top: var(--e1); }
+.leitura-verdade { margin-left: auto; text-align: right; }
+.leitura-familia { font-size: 1.125rem; font-weight: 600; margin-top: var(--e1); }
+.medidas {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem,1fr));
+  gap: var(--e4); margin: var(--e4) 0 0;
+}
+.medida-valor { font-size: 1.25rem; margin-top: var(--e1); }
 
-.aviso-espera {
-  padding: var(--e3) var(--e4);
-  border-left: 2px solid var(--instrumento);
-  background: color-mix(in srgb, var(--instrumento) 8%, transparent);
-  font-size: 0.8125rem;
-  color: var(--texto-medio);
+.avancado-alternar { margin-top: var(--e4); padding-left: 0; }
+.avancado {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem,1fr));
+  gap: var(--e4); margin-top: var(--e3); padding-top: var(--e4);
+  border-top: 1px solid var(--borda);
+}
+.avancado input[type=range] { accent-color: var(--acento); }
+.campo-dica { font-size: 0.75rem; line-height: 1.5; }
+
+.diagnostico { padding: var(--e5); }
+.diagnostico-linha {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--e4); flex-wrap: wrap;
+}
+.diagnostico-nome {
+  font-size: 1.75rem; font-weight: 600; margin-top: var(--e1); letter-spacing: -0.02em;
+}
+.diagnostico-nome--vazio { color: var(--texto-2); }
+.diagnostico-frase {
+  margin-top: var(--e4); font-size: 0.9375rem; color: var(--texto-2); max-width: 70ch;
+}
+.diagnostico-frase b { color: var(--texto); font-weight: 600; }
+
+.votacao { margin-top: var(--e5); }
+.votacao-barra {
+  display: flex; height: 0.5rem; border-radius: var(--raio-pill);
+  overflow: hidden; background: var(--superficie-2);
+}
+.votacao-barra span { transition: width 400ms cubic-bezier(.4,0,.2,1); }
+.votacao-legenda {
+  display: flex; flex-wrap: wrap; gap: var(--e2) var(--e4);
+  margin-top: var(--e3); font-size: 0.8125rem; color: var(--texto-2);
+}
+.votacao-legenda span { display: inline-flex; align-items: center; gap: var(--e2); }
+.votacao-legenda i { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+
+.diagnostico-fonte {
+  display: flex; align-items: center; gap: var(--e2); flex-wrap: wrap;
+  margin-top: var(--e5); padding-top: var(--e4);
+  border-top: 1px solid var(--borda); font-size: 0.875rem;
 }
 
-.diagnostico { border-left: 3px solid var(--instrumento); }
-.diagnostico-topo {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: var(--e5); margin-bottom: var(--e5); flex-wrap: wrap;
+.sem-procedimento {
+  padding: var(--e5); border-color: color-mix(in srgb, var(--atencao) 30%, var(--borda));
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--e4);
 }
-.diagnostico-familia {
-  font-family: var(--fonte-titulo); font-size: 2rem; font-weight: 600;
-  letter-spacing: -0.02em; margin-top: var(--e1);
-}
-.diagnostico-comparacao { margin-top: var(--e2); font-size: 0.875rem; color: var(--texto-medio); }
-.diagnostico-estado { display: flex; flex-direction: column; align-items: flex-end; gap: var(--e3); }
-.diagnostico-confianca { font-size: 1.5rem; font-weight: 500; }
-.diagnostico-confianca .rotulo { font-size: 0.6875rem; }
-.diagnostico-aviso {
-  margin-top: var(--e5); padding: var(--e3) var(--e4);
-  border-left: 2px solid var(--zona-b);
-  background: color-mix(in srgb, var(--zona-b) 8%, transparent);
-  font-size: 0.875rem; color: var(--texto-medio); max-width: 80ch;
-}
-
-.tempos {
-  display: flex; flex-wrap: wrap; gap: var(--e5);
-  margin: var(--e5) 0 0; padding-top: var(--e4);
-  border-top: 1px solid var(--linha);
-}
-.tempo dt { font-family: var(--fonte-titulo); font-size: 0.6875rem; font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--texto-fraco); }
-.tempo dd { margin: var(--e1) 0 0; font-size: 0.875rem; }
-.tempo--destaque dd { color: var(--instrumento-forte); font-weight: 500; }
+.sem-procedimento-texto { white-space: pre-line; max-width: 70ch; line-height: 1.65; }
+.sem-procedimento-nota { font-size: 0.8125rem; max-width: 70ch; }

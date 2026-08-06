@@ -7,7 +7,9 @@ import type {
   EventoSensor,
   FamiliaResumo,
   PontoLinhaDoTempo,
+  MensagemChat,
   RespostaAnalise,
+  RespostaChat,
   Saude,
   VisaoGeral,
 } from './types'
@@ -127,5 +129,20 @@ export function useRegistrarDocumento() {
       void cliente.invalidateQueries({ queryKey: chaves.familias })
       void cliente.invalidateQueries({ queryKey: chaves.visaoGeral })
     },
+  })
+}
+
+export interface PedidoChat {
+  evento: EventoSensor
+  mensagens: MensagemChat[]
+  pergunta: string
+  confianca_minima?: number
+}
+
+/** Conversa ancorada em uma leitura. Cada pergunta recupera trechos de novo. */
+export function useChat() {
+  return useMutation({
+    mutationFn: (pedido: PedidoChat) =>
+      enviar<RespostaChat>('/api/internal/chat', pedido),
   })
 }

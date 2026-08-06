@@ -228,3 +228,24 @@ export interface Saude {
   estado: 'ok' | 'degradado' | 'fora'
   componentes: ComponenteSaude[]
 }
+
+// --- chat ------------------------------------------------------------------
+
+export interface MensagemChat {
+  papel: 'operador' | 'assistente'
+  texto: string
+  citacoes?: Citacao[]
+  embasamento?: number | null
+  recusou?: boolean
+}
+
+export interface RespostaChat {
+  resposta: string
+  citacoes: Citacao[]
+  embasamento: RelatorioEmbasamento | null
+  familia: string | null
+  cobertura: string
+  recusou: boolean
+  sugestoes: string[]
+  tempos: Tempos
+}

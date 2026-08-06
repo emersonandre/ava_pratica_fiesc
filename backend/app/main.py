@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from app.controllers import health
+from app.controllers.internal import chat as internal_chat
 from app.controllers.internal import events as internal_events
 from app.controllers.internal import stats as internal_stats
 from app.controllers.v1 import auth as v1_auth
@@ -85,6 +86,7 @@ def create_app() -> FastAPI:
     application.include_router(v1_upload.router)
     application.include_router(internal_events.router)
     application.include_router(internal_stats.router)
+    application.include_router(internal_chat.router)
 
     @application.get("/", include_in_schema=False)
     def raiz() -> RedirectResponse:

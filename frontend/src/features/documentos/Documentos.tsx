@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { useDocumentos, useFamilias, useRegistrarDocumento } from '../../api/queries'
 import { Carregando, Erro, Vazio } from '../../components/Estado'
-import { Etiqueta } from '../../components/Selo'
 import { numero, rotuloFamilia } from '../../lib/formato'
 import './Documentos.css'
 
@@ -91,7 +90,7 @@ export function Documentos() {
                     <td className="medio">{documento.titulo}</td>
                     <td>
                       {documento.familia ? (
-                        <Etiqueta tom="ok">{rotuloFamilia(documento.familia)}</Etiqueta>
+                        <span className="distintivo distintivo--ok">{rotuloFamilia(documento.familia)}</span>
                       ) : (
                         <span className="fraco">—</span>
                       )}
@@ -106,14 +105,14 @@ export function Documentos() {
                             'O texto pode divergir do original.'
                           }
                         >
-                          <Etiqueta tom="atencao">
+                          <span className="distintivo distintivo--atencao">
                             OCR
                             {documento.confianca_ocr !== null &&
                               ` · ${(documento.confianca_ocr * 100).toFixed(0)}%`}
-                          </Etiqueta>
+                          </span>
                         </span>
                       ) : (
-                        <Etiqueta>camada de texto</Etiqueta>
+                        <span className="distintivo distintivo--neutro">camada de texto</span>
                       )}
                     </td>
                   </tr>

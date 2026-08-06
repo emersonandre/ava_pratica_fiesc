@@ -1,122 +1,46 @@
-.cobertura {
-  display: grid;
-  grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr);
-  gap: var(--e6);
-  padding: var(--e5) var(--e6);
-  margin-bottom: var(--e5);
-  border-left: 3px solid var(--instrumento);
+.regra { padding: var(--e6); margin-bottom: var(--e5); overflow: hidden; position: relative; }
+.regra::before {
+  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
+  background: linear-gradient(180deg, var(--acento), transparent);
 }
+.regra-texto h2 { margin: var(--e3) 0 var(--e3); font-size: 1.5rem; }
+.regra-texto > p { max-width: 68ch; font-size: 1rem; }
+.regra-texto b { color: var(--texto); font-weight: 600; }
 
-.cobertura-numero {
-  border-right: 1px solid var(--linha);
-  padding-right: var(--e5);
+.regra-barra { display: flex; gap: var(--e2); margin: var(--e5) 0 var(--e4); }
+.regra-marca {
+  height: 0.5rem; flex: 1; max-width: 3.5rem; border-radius: var(--raio-pill);
+  background: var(--superficie-3);
 }
+.regra-marca--ok { background: var(--ok); }
 
-.cobertura-fracao {
-  margin-top: var(--e2);
-  font-family: var(--fonte-titulo);
-  font-size: 3.5rem;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-
-.cobertura-fracao span {
-  font-size: 1.75rem;
-  font-weight: 400;
-}
-
-.cobertura-legenda {
-  margin-top: var(--e2);
-  font-size: 0.8125rem;
-  color: var(--texto-medio);
-  max-width: 20ch;
-}
-
-.cobertura-detalhe h2 {
-  font-size: 1.25rem;
-  margin-bottom: var(--e4);
-}
-
-.cobertura-trilha {
-  height: 0.5rem;
-  background: var(--fundo);
-  border: 1px solid var(--linha-forte);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.cobertura-preenchida {
-  display: block;
-  height: 100%;
-  background: var(--instrumento);
-  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cobertura-texto {
-  margin-top: var(--e4);
+.regra-lacuna {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--e2);
   font-size: 0.875rem;
-  color: var(--texto-medio);
-  line-height: 1.7;
-  max-width: 72ch;
 }
+.regra-link { margin-left: var(--e2); font-size: 0.875rem; }
 
-.indicadores {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: var(--e3);
-  margin-bottom: var(--e5);
+.etapas {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem,1fr));
+  gap: var(--e4); margin-bottom: var(--e5);
 }
+.etapa { padding: var(--e5); }
+.etapa-numero {
+  display: grid; place-items: center; width: 1.75rem; height: 1.75rem;
+  border-radius: 50%; background: var(--acento-fundo); color: var(--acento-claro);
+  font-size: 0.8125rem; font-weight: 600; margin-bottom: var(--e3);
+}
+.etapa h3 { margin-bottom: var(--e2); }
+.etapa p { font-size: 0.875rem; }
 
-.indicador {
-  padding: var(--e4) var(--e5);
-}
+.cartao + .cartao, .etapas + .cartao { margin-top: var(--e5); }
+.cartao-corpo--tabela { padding: var(--e2) var(--e3) var(--e3); overflow-x: auto; }
 
-.indicador-valor {
-  margin-top: var(--e2);
-  font-size: 1.75rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+.falha-nome {
+  display: inline-flex; align-items: center; gap: var(--e2);
+  color: var(--texto); font-weight: 500;
 }
+.falha-nome:hover { color: var(--acento-claro); text-decoration: none; }
+.falha-nome i { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
 
-.indicador-nota {
-  margin-top: var(--e1);
-  font-size: 0.75rem;
-  color: var(--texto-fraco);
-}
-
-.painel + .painel {
-  margin-top: var(--e5);
-}
-
-.painel-corpo--tabela {
-  padding: var(--e2) var(--e3) var(--e3);
-  overflow-x: auto;
-}
-
-.familia-nome {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e2);
-  color: var(--texto);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.familia-nome:hover {
-  color: var(--instrumento-forte);
-}
-
-.familia-marca {
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 1px;
-  flex: none;
-}
-
-.grafico-nota {
-  margin-top: var(--e4);
-  font-size: 0.75rem;
-  line-height: 1.6;
-  max-width: 76ch;
-}
+.grafico-nota { margin-top: var(--e4); font-size: 0.75rem; max-width: 72ch; color: var(--texto-3); }

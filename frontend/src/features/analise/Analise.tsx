@@ -5,14 +5,10 @@ import type { Desfecho, PedidoAmostra } from '../../api/queries'
 import { useAmostra, useAnalisar, useFamilias } from '../../api/queries'
 import type { AmostraHoldout, EventoSensor, RespostaAnalise } from '../../api/types'
 import { COLUNAS_SENSOR } from '../../api/types'
-import { BarraDeVotos } from '../../components/BarraDeVotos'
 import { Erro } from '../../components/Estado'
-import { Selo } from '../../components/Selo'
-import { duracao, porcento, rotuloFamilia } from '../../lib/formato'
-import { Controles } from './Controles'
-import { Evidencia } from './Evidencia'
-import { Prescricao } from './Prescricao'
-import { Vizinhos } from './Vizinhos'
+import { corDaFamilia, porcento, rotuloFamilia } from '../../lib/formato'
+import { Chat } from './Chat'
+import { Detalhes } from './Detalhes'
 import './Analise.css'
 
 function paraEvento(amostra: AmostraHoldout): EventoSensor {
@@ -25,225 +21,342 @@ export function Analise() {
   const [parametros] = useSearchParams()
   const familiaAlvo = parametros.get('familia') ?? undefined
 
-  const [amostraAtual, setAmostraAtual] = useState<AmostraHoldout | null>(null)
-  const [pergunta, setPergunta] = useState('Como corrigir esta falha?')
+  const [leitura, setLeitura] = useState<AmostraHoldout | null>(null)
   const [familia, setFamilia] = useState(familiaAlvo ?? '')
   const [desfecho, setDesfecho] = useState<Desfecho>('prescricao')
   const [limiar, setLimiar] = useState(0.7)
+  const [avancado, setAvancado] = useState(false)
 
   const familias = useFamilias()
   const amostra = useAmostra()
   const analise = useAnalisar()
 
-  // Carrega uma leitura ao abrir, ja filtrada pela familia vinda do painel.
   useEffect(() => {
     setFamilia(familiaAlvo ?? '')
-    sortear({ familia: familiaAlvo, desfecho: 'prescricao', confiancaMinima: 0.7 })
+    buscar({ familia: familiaAlvo, desfecho: 'prescricao', confiancaMinima: 0.7 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [familiaAlvo])
 
-  function sortear(pedido: PedidoAmostra) {
+  function buscar(pedido: PedidoAmostra) {
     analise.reset()
-    amostra.mutate(pedido, { onSuccess: setAmostraAtual })
+    amostra.mutate(pedido, { onSuccess: setLeitura })
   }
 
-  function buscar() {
-    sortear({
-      familia: familia || undefined,
-      desfecho,
-      confiancaMinima: limiar,
-    })
+  function novaLeitura() {
+    buscar({ familia: familia || undefined, desfecho, confiancaMinima: limiar })
   }
 
   function analisar() {
-    if (!amostraAtual) return
-    analise.mutate({
-      ...paraEvento(amostraAtual),
-      pergunta,
-      confianca_minima: limiar,
-    })
+    if (!leitura) return
+    analise.mutate({ ...paraEvento(leitura), confianca_minima: limiar })
   }
 
-  const resposta = analise.data
+  const resultado = analise.data
 
   return (
     <>
-      <header className="pagina-cabecalho">
-        <h1>Análise de evento</h1>
-        <p>
-          Cada leitura vem do conjunto de teste — dados de 10 a 16 de junho, que o
-          sistema nunca usou para aprender. O rótulo real aparece ao lado do
-          diagnóstico, acerto ou erro.
+      <header className="cabecalho">
+        <h1>Analisar uma leitura</h1>
+        <p className="t2">
+          O sistema compara a leitura com o histórico da máquina, identifica a falha e
+          consulta os procedimentos cadastrados para dizer o que fazer.
         </p>
       </header>
 
-      <section className="painel entrada">
-        <div className="painel-cabecalho">
-          <h2>Leitura do sensor</h2>
-          {amostraAtual && (
-            <span className="fraco dado">
-              #{amostraAtual.id} · {amostraAtual.raw_fault}
-            </span>
-          )}
+      {/* ---------------- passo 1 ---------------- */}
+      <section className="passo">
+        <div className="passo-marca">
+          <span className="passo-numero">1</span>
+          <span className="passo-linha" />
         </div>
 
-        <div className="painel-corpo entrada-corpo">
-          <Controles
-            familias={familias.data ?? []}
-            familia={familia}
-            aoMudarFamilia={setFamilia}
-            desfecho={desfecho}
-            aoMudarDesfecho={setDesfecho}
-            limiar={limiar}
-            aoMudarLimiar={setLimiar}
-          />
+        <div className="passo-conteudo">
+          <h2>Escolher a leitura</h2>
+          <p className="t2 passo-nota">
+            Vem do conjunto de teste: dados reais de 10 a 16 de junho que o sistema
+            nunca usou para aprender.
+          </p>
 
-          {amostra.isError && <Erro erro={amostra.error} aoTentarNovamente={buscar} />}
+          {amostra.isError && <Erro erro={amostra.error} aoTentarNovamente={novaLeitura} />}
 
-          {amostraAtual && (
-            <>
-              <dl className="leitura">
-                <Medida rotulo="Registro" valor={`#${amostraAtual.id}`} />
-                <Medida rotulo="Rotação" valor={amostraAtual.rpm} unidade="rpm" />
-                <Medida
-                  rotulo="Temperatura"
-                  valor={amostraAtual.temperature_c}
-                  unidade="°C"
-                />
-                <Medida
-                  rotulo="Velocidade RMS Z"
-                  valor={amostraAtual.z_rms_velocity_mm_s}
-                  unidade="mm/s"
-                />
-                <Medida
-                  rotulo="Velocidade RMS X"
-                  valor={amostraAtual.x_rms_velocity_mm_s}
-                  unidade="mm/s"
-                />
-                <Medida rotulo="Kurtosis Z" valor={amostraAtual.z_kurtosis} />
-                <Medida rotulo="Crest factor Z" valor={amostraAtual.z_crest_factor} />
-                <Medida
-                  rotulo="Freq. de pico Z"
-                  valor={amostraAtual.z_peak_vel_comp_freq_hz}
-                  unidade="Hz"
-                />
-              </dl>
-
-              <div className="entrada-acoes">
-                <label className="campo">
-                  <span className="rotulo">Pergunta ao assistente</span>
-                  <input
-                    value={pergunta}
-                    onChange={(e) => setPergunta(e.target.value)}
-                    placeholder="Como corrigir esta falha?"
-                  />
-                </label>
-
+          {leitura && (
+            <div className="cartao leitura">
+              <div className="leitura-topo">
+                <div>
+                  <span className="rotulo">Leitura</span>
+                  <p className="leitura-id dado">#{leitura.id}</p>
+                </div>
+                <div className="leitura-verdade">
+                  <span className="rotulo">Condição real anotada pelo operador</span>
+                  <p
+                    className="leitura-familia"
+                    style={{ color: corDaFamilia(leitura.fault_family) }}
+                  >
+                    {rotuloFamilia(leitura.fault_family)}
+                  </p>
+                </div>
                 <button
                   type="button"
                   className="botao"
-                  onClick={buscar}
+                  onClick={novaLeitura}
                   disabled={amostra.isPending}
                 >
-                  {amostra.isPending ? 'Procurando…' : 'Outra leitura'}
-                </button>
-
-                <button
-                  type="button"
-                  className="botao botao-primario"
-                  onClick={analisar}
-                  disabled={analise.isPending || !amostraAtual}
-                >
-                  {analise.isPending ? 'Analisando…' : 'Analisar'}
+                  {amostra.isPending ? 'Buscando…' : 'Trocar leitura'}
                 </button>
               </div>
 
-              {analise.isPending && (
-                <p className="aviso-espera">
-                  A geração do procedimento leva de 30 a 70 segundos. O modelo usado
-                  raciocina antes de escrever.
-                </p>
+              <dl className="medidas">
+                <Medida rotulo="Rotação" valor={leitura.rpm} unidade="rpm" />
+                <Medida rotulo="Temperatura" valor={leitura.temperature_c} unidade="°C" />
+                <Medida
+                  rotulo="Vibração eixo Z"
+                  valor={leitura.z_rms_velocity_mm_s}
+                  unidade="mm/s"
+                />
+                <Medida
+                  rotulo="Vibração eixo X"
+                  valor={leitura.x_rms_velocity_mm_s}
+                  unidade="mm/s"
+                />
+              </dl>
+
+              <button
+                type="button"
+                className="botao-texto avancado-alternar"
+                onClick={() => setAvancado(!avancado)}
+                aria-expanded={avancado}
+              >
+                {avancado ? '− Ocultar' : '+ Mostrar'} opções de demonstração
+              </button>
+
+              {avancado && (
+                <div className="avancado">
+                  <label className="campo">
+                    <span className="rotulo">Tipo de caso</span>
+                    <select
+                      value={desfecho}
+                      onChange={(e) => setDesfecho(e.target.value as Desfecho)}
+                    >
+                      <option value="prescricao">Falha com procedimento cadastrado</option>
+                      <option value="sem_documento">Falha sem procedimento</option>
+                      <option value="sem_diagnostico">Sinal ambíguo</option>
+                      <option value="qualquer">Sorteio livre</option>
+                    </select>
+                  </label>
+
+                  <label className="campo">
+                    <span className="rotulo">Falha</span>
+                    <select value={familia} onChange={(e) => setFamilia(e.target.value)}>
+                      <option value="">Todas</option>
+                      {(familias.data ?? [])
+                        .filter((f) => f.e_problema)
+                        .map((f) => (
+                          <option key={f.familia} value={f.familia}>
+                            {rotuloFamilia(f.familia)}
+                            {f.coberta ? '' : ' — sem procedimento'}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+
+                  <label className="campo">
+                    <span className="rotulo">
+                      Certeza mínima para diagnosticar: {porcento(limiar)}
+                    </span>
+                    <input
+                      type="range"
+                      min="0.4"
+                      max="0.95"
+                      step="0.05"
+                      value={limiar}
+                      onChange={(e) => setLimiar(Number(e.target.value))}
+                    />
+                    <span className="t3 campo-dica">
+                      Exigir mais certeza faz o sistema responder menos vezes e acertar
+                      mais. Abaixo do limite, ele prefere não opinar.
+                    </span>
+                  </label>
+                </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </section>
 
-      {analise.isError && <Erro erro={analise.error} aoTentarNovamente={analisar} />}
+      {/* ---------------- passo 2 ---------------- */}
+      <section className="passo">
+        <div className="passo-marca">
+          <span className={`passo-numero ${resultado ? 'passo-numero--feito' : ''}`}>
+            2
+          </span>
+          <span className="passo-linha" />
+        </div>
 
-      {resposta && amostraAtual && (
-        <Resultado resposta={resposta} rotuloReal={amostraAtual.fault_family} />
+        <div className="passo-conteudo">
+          <h2>Identificar a falha</h2>
+          <p className="t2 passo-nota">
+            Busca as leituras mais parecidas no histórico e vê em que elas concordam.
+          </p>
+
+          {!resultado && (
+            <button
+              type="button"
+              className="botao botao-primario botao-grande"
+              onClick={analisar}
+              disabled={!leitura || analise.isPending}
+            >
+              {analise.isPending ? 'Comparando com o histórico…' : 'Identificar falha'}
+            </button>
+          )}
+
+          {analise.isError && <Erro erro={analise.error} aoTentarNovamente={analisar} />}
+
+          {resultado && leitura && (
+            <Diagnostico resultado={resultado} verdade={leitura.fault_family} />
+          )}
+        </div>
+      </section>
+
+      {/* ---------------- passo 3 ---------------- */}
+      {resultado && leitura && (
+        <section className="passo passo--ultimo">
+          <div className="passo-marca">
+            <span className="passo-numero passo-numero--feito">3</span>
+          </div>
+
+          <div className="passo-conteudo">
+            <h2>Perguntar o que fazer</h2>
+            <p className="t2 passo-nota">
+              O assistente responde consultando os procedimentos técnicos da falha
+              identificada — e diz quando a documentação não cobre a pergunta.
+            </p>
+
+            {resultado.cobertura.coberta ? (
+              <Chat evento={leitura} limiar={limiar} />
+            ) : (
+              <SemProcedimento resultado={resultado} />
+            )}
+          </div>
+        </section>
       )}
+
+      {resultado && <Detalhes resultado={resultado} />}
     </>
   )
 }
 
-function Resultado({
-  resposta,
-  rotuloReal,
+function Diagnostico({
+  resultado,
+  verdade,
 }: {
-  resposta: RespostaAnalise
-  rotuloReal: string
+  resultado: RespostaAnalise
+  verdade: string
 }) {
-  const { diagnostico, cobertura, tempos } = resposta
-  const acertou = diagnostico.familia === rotuloReal
+  const { diagnostico, cobertura } = resultado
+  const acertou = diagnostico.familia === verdade
+  const vencedor = diagnostico.votos[0]
 
   return (
-    <>
-      <section className="painel diagnostico">
-        <div className="painel-corpo">
-          <div className="diagnostico-topo">
+    <div className="cartao diagnostico">
+      {diagnostico.familia ? (
+        <>
+          <div className="diagnostico-linha">
             <div>
-              <p className="rotulo">Diagnóstico por similaridade</p>
-              <p className="diagnostico-familia">
-                {diagnostico.familia
-                  ? rotuloFamilia(diagnostico.familia)
-                  : 'Sem diagnóstico'}
-              </p>
-              <p className="diagnostico-comparacao">
-                rótulo real:{' '}
-                <b style={{ color: acertou ? 'var(--zona-a)' : 'var(--zona-c)' }}>
-                  {rotuloFamilia(rotuloReal)}
-                </b>
-                <span className="fraco">
-                  {' '}
-                  · {acertou ? 'coincide' : 'não coincide'}
-                </span>
+              <span className="rotulo">Falha identificada</span>
+              <p
+                className="diagnostico-nome"
+                style={{ color: corDaFamilia(diagnostico.familia) }}
+              >
+                {rotuloFamilia(diagnostico.familia)}
               </p>
             </div>
-
-            <div className="diagnostico-estado">
-              <Selo motivo={cobertura.motivo} />
-              <p className="diagnostico-confianca dado">
-                {porcento(diagnostico.confianca)}
-                <span className="rotulo"> concordância</span>
-              </p>
-            </div>
+            <span className={`distintivo distintivo--${acertou ? 'ok' : 'atencao'}`}>
+              {acertou ? 'confere com o rótulo real' : 'diverge do rótulo real'}
+            </span>
           </div>
 
-          <BarraDeVotos votos={diagnostico.votos} />
+          <p className="diagnostico-frase">
+            {vencedor?.vizinhos ?? 0} das {resultado.vizinhos.length} leituras mais
+            parecidas do histórico apresentavam esta mesma falha
+            <b> ({porcento(diagnostico.confianca)} de concordância)</b>.
+          </p>
+        </>
+      ) : (
+        <>
+          <div className="diagnostico-linha">
+            <div>
+              <span className="rotulo">Resultado</span>
+              <p className="diagnostico-nome diagnostico-nome--vazio">
+                Sinal ambíguo
+              </p>
+            </div>
+            <span className="distintivo distintivo--atencao">sem conclusão</span>
+          </div>
 
-          {diagnostico.aviso && <p className="diagnostico-aviso">{diagnostico.aviso}</p>}
-
-          <dl className="tempos">
-            <Tempo rotulo="Similaridade" ms={tempos.similaridade_ms} />
-            <Tempo rotulo="Cobertura" ms={tempos.cobertura_ms} />
-            <Tempo rotulo="Busca documental" ms={tempos.recuperacao_ms} />
-            <Tempo rotulo="Geração" ms={tempos.geracao_ms} />
-            <Tempo rotulo="Verificação" ms={tempos.verificacao_ms} />
-            <Tempo rotulo="Total" ms={tempos.total_ms} destaque />
-          </dl>
-        </div>
-      </section>
-
-      <Prescricao resposta={resposta} />
-
-      {resposta.evidencia && (
-        <Evidencia evidencia={resposta.evidencia} familia={diagnostico.familia} />
+          <p className="diagnostico-frase">
+            As leituras parecidas do histórico não concordam entre si — a mais votada
+            reúne só {porcento(diagnostico.confianca)}. O sistema prefere não opinar a
+            arriscar um diagnóstico errado.
+          </p>
+        </>
       )}
 
-      <Vizinhos vizinhos={resposta.vizinhos} rotuloReal={rotuloReal} />
-    </>
+      <div className="votacao">
+        <div className="votacao-barra">
+          {diagnostico.votos.map((voto) => (
+            <span
+              key={voto.fault_family}
+              style={{
+                width: `${voto.peso * 100}%`,
+                background: corDaFamilia(voto.fault_family),
+              }}
+              title={`${rotuloFamilia(voto.fault_family)}: ${porcento(voto.peso)}`}
+            />
+          ))}
+        </div>
+        <div className="votacao-legenda">
+          {diagnostico.votos.slice(0, 3).map((voto) => (
+            <span key={voto.fault_family}>
+              <i style={{ background: corDaFamilia(voto.fault_family) }} />
+              {rotuloFamilia(voto.fault_family)} {porcento(voto.peso)}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {cobertura.coberta && (
+        <p className="diagnostico-fonte t2">
+          Procedimento disponível:{' '}
+          {cobertura.documentos.map((documento) => (
+            <span key={documento.arquivo} className="distintivo distintivo--acento">
+              {documento.arquivo}
+            </span>
+          ))}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function SemProcedimento({ resultado }: { resultado: RespostaAnalise }) {
+  const { recusa } = resultado
+
+  return (
+    <div className="cartao sem-procedimento">
+      <span className="distintivo distintivo--atencao">Nenhuma recomendação</span>
+      <p className="sem-procedimento-texto">
+        {recusa?.mensagem ?? 'Não há procedimento cadastrado para esta falha.'}
+      </p>
+      {recusa?.sugestao && (
+        <a href="/documentos" className="botao botao-primario">
+          Cadastrar procedimento
+        </a>
+      )}
+      <p className="t3 sem-procedimento-nota">
+        O assistente não foi consultado. A decisão de não responder é tomada antes,
+        por regra — não depende do modelo se comportar bem.
+      </p>
+    </div>
   )
 }
 
@@ -253,33 +366,16 @@ function Medida({
   unidade,
 }: {
   rotulo: string
-  valor: number | string
-  unidade?: string
+  valor: number
+  unidade: string
 }) {
   return (
-    <div className="medida">
+    <div>
       <dt className="rotulo">{rotulo}</dt>
-      <dd className="dado">
-        {typeof valor === 'number' ? valor.toFixed(3).replace(/\.?0+$/, '') : valor}
-        {unidade && <span className="medida-unidade"> {unidade}</span>}
+      <dd className="dado medida-valor">
+        {valor.toFixed(2).replace(/\.00$/, '')}
+        <span className="t3"> {unidade}</span>
       </dd>
-    </div>
-  )
-}
-
-function Tempo({
-  rotulo,
-  ms,
-  destaque,
-}: {
-  rotulo: string
-  ms: number
-  destaque?: boolean
-}) {
-  return (
-    <div className={`tempo ${destaque ? 'tempo--destaque' : ''}`}>
-      <dt>{rotulo}</dt>
-      <dd className="dado">{ms > 0 ? duracao(ms) : '—'}</dd>
     </div>
   )
 }
