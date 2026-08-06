@@ -15,7 +15,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [x] **Estado não vira prescrição**
   - *Verificação:* Evento diagnosticado como `normal` ou `motor_desligado` retorna `reason = state_not_problem`, sem prescrição.
 
-- [ ] **Fora de distribuição é distinguido de falta de documento**
+- [x] **Fora de distribuição é distinguido de falta de documento**
   - *Verificação:* Evento fora de distribuição retorna `reason = out_of_distribution`, com mensagem diferente da de documento ausente.
 
 - [x] **Cobertura se atualiza sozinha**

@@ -15,7 +15,7 @@ Marque um item apenas quando ele tiver sido **verificado na prática**, não qua
 - [ ] **Histórico de commits conta a construção**
   - *Verificação:* O `git log` mostra commits incrementais com mensagens no padrão Conventional Commits, não um commit único.
 
-- [ ] **Observabilidade real**
+- [x] **Observabilidade real**
   - *Verificação:* Toda requisição registra identificador, rota, tempo por etapa e resultado em log JSON.
 
 - [ ] **README permite reproduzir do zero**

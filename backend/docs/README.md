@@ -11,8 +11,8 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | | |
 | --- | --- |
 | Features | 16 |
-| Features concluídas | 8 |
-| Tarefas concluídas | 91 / 112 (81%) |
+| Features concluídas | 11 |
+| Tarefas concluídas | 106 / 112 (95%) |
 
 ## Infraestrutura e dados
 
@@ -30,7 +30,7 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 | 🟨 | [SPEC-FEAT-005 — Motor de similaridade histórica](SPEC-FEAT-005/spec.md) | 7/7 | 5/6 |
 | ✅ | [SPEC-FEAT-006 — Extração de texto e OCR dos documentos](SPEC-FEAT-006/spec.md) | 7/7 | 6/6 |
 | ✅ | [SPEC-FEAT-007 — Indexação semântica dos documentos](SPEC-FEAT-007/spec.md) | 7/7 | 6/6 |
-| 🟨 | [SPEC-FEAT-008 — Mapa falha→documento e gate de cobertura](SPEC-FEAT-008/spec.md) | 7/7 | 6/7 |
+| ✅ | [SPEC-FEAT-008 — Mapa falha→documento e gate de cobertura](SPEC-FEAT-008/spec.md) | 7/7 | 7/7 |
 
 ## RAG e LLM
 
@@ -45,7 +45,7 @@ Gerado por `tools/specs/gen.py` a partir de `tools/specs/catalog_backend.py`. N�
 
 | Status | Feature | Tarefas | Aceite |
 | :---: | --- | :---: | :---: |
-| 🟨 | [SPEC-FEAT-013 — API REST](SPEC-FEAT-013/spec.md) | 3/8 | 1/9 |
-| ⬜ | [SPEC-FEAT-014 — Registro de novo documento de falha](SPEC-FEAT-014/spec.md) | 0/7 | 0/6 |
+| ✅ | [SPEC-FEAT-013 — API REST](SPEC-FEAT-013/spec.md) | 8/8 | 9/9 |
+| ✅ | [SPEC-FEAT-014 — Registro de novo documento de falha](SPEC-FEAT-014/spec.md) | 7/7 | 6/6 |
 | ✅ | [SPEC-FEAT-016 — Autenticação: JWT externo e chave interna](SPEC-FEAT-016/spec.md) | 8/8 | 9/9 |
-| ⬜ | [SPEC-FEAT-015 — Testes, qualidade e observabilidade](SPEC-FEAT-015/spec.md) | 0/6 | 0/6 |
+| 🟨 | [SPEC-FEAT-015 — Testes, qualidade e observabilidade](SPEC-FEAT-015/spec.md) | 3/6 | 1/6 |

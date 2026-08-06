@@ -26,7 +26,11 @@ from fastapi.responses import RedirectResponse
 
 from app.controllers import health
 from app.controllers.internal import events as internal_events
+from app.controllers.internal import stats as internal_stats
 from app.controllers.v1 import auth as v1_auth
+from app.controllers.v1 import predict as v1_predict
+from app.controllers.v1 import upload_doc as v1_upload
+from app.middleware.logging import LogDeRequisicao
 from app.settings import get_settings
 
 logger = logging.getLogger("prescritiva")
@@ -66,6 +70,7 @@ def create_app() -> FastAPI:
         ],
     )
 
+    application.add_middleware(LogDeRequisicao)
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
@@ -76,7 +81,10 @@ def create_app() -> FastAPI:
 
     application.include_router(health.router)
     application.include_router(v1_auth.router)
+    application.include_router(v1_predict.router)
+    application.include_router(v1_upload.router)
     application.include_router(internal_events.router)
+    application.include_router(internal_stats.router)
 
     @application.get("/", include_in_schema=False)
     def raiz() -> RedirectResponse:
