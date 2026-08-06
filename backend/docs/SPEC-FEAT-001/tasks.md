@@ -11,7 +11,7 @@
 - [x] Implementar `app/scripts/gen_secrets.py` para gerar os segredos de autenticação
 - [x] Implementar `manage.py` com os comandos administrativos
 - [x] Criar `.gitignore` cobrindo `.venv`, `.env`, `__pycache__`, artefatos de modelo
-- [ ] Escrever os `Dockerfile` de backend e frontend
+- [x] Escrever os `Dockerfile` de backend e frontend
 - [ ] Validar: subir do zero em máquina limpa e registrar o tempo no README
 
 ---

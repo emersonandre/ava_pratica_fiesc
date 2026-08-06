@@ -3,9 +3,9 @@
 **Feature:** Chat prescritivo com citações
 
 - [ ] Implementar o componente de conversa com histórico ancorado no evento
-- [ ] Implementar a renderização seccionada da resposta prescritiva
-- [ ] Implementar citações clicáveis e o painel lateral de trecho recuperado
-- [ ] Implementar o indicador de embasamento e a lista de itens removidos
+- [x] Implementar a renderização seccionada da resposta prescritiva
+- [x] Implementar citações clicáveis e o painel lateral de trecho recuperado
+- [x] Implementar o indicador de embasamento e a lista de itens removidos
 - [ ] Implementar perguntas sugeridas por diagnóstico
 - [ ] Implementar streaming (ou indicador de progresso por etapa)
 - [ ] Tratar erro do provider preservando o histórico
