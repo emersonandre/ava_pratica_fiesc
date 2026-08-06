@@ -62,7 +62,14 @@ function validar(texto: string): Analise {
     return { valida: false, erro: 'O JSON precisa ser um objeto com os campos da leitura.' }
   }
 
-  const dados = bruto as Record<string, unknown>
+  // A quebra de linha do documento cai em qualquer ponto -- inclusive no meio do
+  // nome de um campo, que entao chega como `z_peak_vel_comp_freq_hz ` e nao
+  // corresponde a coluna nenhuma. Aparar chave e valor resolve, e nao muda nada
+  // num JSON que ja viesse limpo.
+  const dados: Record<string, unknown> = {}
+  for (const [chave, valor] of Object.entries(bruto as Record<string, unknown>)) {
+    dados[chave.trim()] = typeof valor === 'string' ? valor.trim() : valor
+  }
   const faltando: string[] = []
   const naoNumericos: string[] = []
   const leitura = {} as Record<string, unknown>
