@@ -35,7 +35,6 @@ ava_pratica_fiesc/
 ├── arquivos/
 │   └── Doc1..Doc6.pdf      # documentação de falhas fornecida pela empresa
 ├── tools/specs/            # catálogo das specs e gerador de status
-├── desafio.md              # enunciado original
 ├── estrutura.md            # este documento
 ├── ARQUITETURA.md          # arquitetura de solução e de implantação industrial
 ├── ROTEIRO.md              # passo a passo da demonstração
