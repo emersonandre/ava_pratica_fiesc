@@ -1,4 +1,4 @@
-# Manutenção Prescritiva com IA — Chão de Fábrica
+# Manutenção Preditiva com IA — Chão de Fábrica
 
 Solução para o estudo de caso do **Processo Seletivo 02198/2026 — Desenvolvedor Full Stack
 Pleno (IA e Python)**, FIESC / SENAI SC.
